@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { siteConfig as s } from "@/lib/site-config";
 import "./globals.css";
+import "./assistant.css";
 export const metadata: Metadata = {
   title: s.title, description: s.description,
   ...(s.siteUrl ? { metadataBase: new URL(s.siteUrl), alternates: { canonical: s.siteUrl } } : {}),
