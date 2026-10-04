@@ -1,78 +1,56 @@
-# 구현 및 검증 기록
+# LabSync 리디자인 검증
 
 검증일: 2026-10-04 (KST)
 
-## 초기 상태
+## 변경 범위
 
-작업 폴더에는 `.vscode/extensions.json`만 있었습니다. 기존 framework, 예약·admin·Calendar·Firebase 코드, 환경변수, 공개 자산, Git 저장소가 없었습니다. 기존 VS Code 설정은 변경하지 않았습니다.
+Next.js 16.3.8 / React 19.3.0 / 기존 Pretendard와 CSS를 유지했습니다. 기존 앱에는 `/`와 OG 이미지 경로만 있으며 backend/admin/Calendar 기능은 없습니다. 새 의존성을 추가하지 않았습니다. 사용자가 스테이징한 `.vscode/extensions.json`은 수정하거나 커밋에 포함하지 않습니다.
 
-## 실행 결과
+기존 독립 Current Workflow, Safety, Pilot Fit, Scope 섹션을 통합·축소했습니다. 과도한 섹션 번호, 반복 카피, 고객용 내부 용어 `v0`, 문의 채널 준비 안내를 제거했습니다.
+
+새 구조는 Hero → 문제와 운영 비교 → 운영 타임라인과 확인 원칙 → Pilot과 대상·범위 → Final CTA입니다. 1440px 전체 페이지 높이는 5,033px에서 3,282px로 줄었습니다. SEM-1 변경 카드는 실제 고객 기록이 아닌 명시적인 운영 예시입니다.
+
+## 실제 검사
 
 | 검사 | 결과 |
 | --- | --- |
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm run build` | PASS, 정적 페이지 생성 |
-| 375px / 768px / 1440px Edge 브라우저 | PASS |
+| `npm run build` | PASS |
+| `npx playwright test` | PASS, 3개 viewport |
+| 375 / 768 / 1440px | PASS, 실제 Edge 캡처 확인 |
 | 가로 넘침 / H1 하나 / 한국어 lang | PASS |
+| Hero 줄바꿈 / 운영 예시 / 가격 / 모바일 타임라인 | PASS |
 | 내부 anchor 대상 | PASS |
-| 주요 CTA 4개 문구 및 미설정 fallback 이동 | PASS |
+| CTA 4개 / 문의 주소 미설정 시 비활성 상태 | PASS |
 | 브라우저 console error / pageerror | PASS, 오류 없음 |
 | title / OG 1200×630 / PNG 응답 / favicon | PASS |
-| 실제 외부 문의 접수 | 미검증: 문의 주소 미제공 |
-| canonical / 공개 OG URL | 설정 대기: NEXT_PUBLIC_SITE_URL 미제공 |
-| GitHub push / Vercel 배포 | 미실행: 원격 저장소·배포 연결 없음 |
-| Lighthouse 점수 | 측정하지 않음 |
+| `git diff --check` | PASS |
 
-`npx playwright test`로 3개 화면 검사를 재실행할 수 있습니다. 먼저 `npm run build`, `npm start -- --port 3100`을 실행합니다. 테스트는 설치된 Microsoft Edge를 사용합니다. 전체 화면 캡처는 `artifacts/landing-{375,768,1440}.png`에 저장되며 Git에서 제외됩니다.
+검사 방법: `npm run build` 후 `npm start -- --port 3100`, 별도 터미널에서 `npx playwright test`. 테스트는 설치된 Microsoft Edge를 사용합니다. 전체 페이지·Hero·Pilot 캡처는 Git에서 제외된 `artifacts/redesign-*.png`에 있습니다.
 
-공개 URL 미설정 시 Next.js는 OG 이미지 기준 주소로 localhost:3000을 사용합니다. 공개 전 실제 NEXT_PUBLIC_SITE_URL을 설정하고 재빌드해야 합니다. 문의 주소가 없을 때 CTA는 접수 가능한 것처럼 동작하지 않고, 문의 준비 안내로 이동합니다.
+## 유지한 조건
 
-## A–J 콘텐츠 자체 검토
+- ₩300,000, 최대 5개 공용장비 Google Calendar
+- 초기 설정/온보딩, 운영 시작 후 6주 운영 관찰
+- 월–금 09:00–18:00 KST
+- 영업시간 기준 4시간 이내 접수 확인 목표
+- 해결 시간 보장 없음, 자동 갱신 없음
 
-이 결과는 사용자 연구나 실제 전환율 검증이 아닌 구현자 검토입니다.
+## 문의 설정
 
-| 항목 | 결과 | 근거 |
-| --- | --- | --- |
-| A. 3초 내 서비스 이해 | PASS | 첫 화면에 Google Calendar, 공용장비, 연구실, 운영 대행 표시 |
-| B. 새 예약 SaaS 오해 방지 | PASS | 기존 Calendar 유지, 운영 대행 명시 |
-| C. 연구원/연구실 대상 | PASS | 첫 화면 대상 문구와 headline |
-| D. ₩300,000 가격 | PASS | Hero 및 단일 Pilot 카드 |
-| E. Pilot 포함 사항 | PASS | 온보딩·최대 5개·6주·운영시간·접수 목표·자동 갱신 없음 |
-| F. 제외 범위 | PASS | Calendar 대체·IT·메일·장비 유지보수·데이터 관리 제외 |
-| G. 미확인 주장 없음 | PASS | 가상 후기·고객·ROI·실적 없음 |
-| H. CTA 통일 | PASS | 4개 모두 Paid Pilot 문의하기 |
-| I. 모바일 이해 가능 | PASS | 375px 실브라우저 캡처 및 CTA 동작 확인 |
-| J. 기존 기능 보존 | PASS | 기존 앱 자체가 없었으며 VS Code 설정 보존 |
+사용자는 전용 문의 주소가 아직 없으며 CTA 디자인만 유지하도록 요청했습니다. 환경변수 예제의 값은 비어 있고 가짜 주소는 추가하지 않았습니다.
 
-## 가상 고객 관점 검토
+- 값이 없으면 실제 전송이나 빈 링크가 없는 비활성 버튼으로 렌더링합니다.
+- `NEXT_PUBLIC_CONTACT_URL`에 Google Form URL을 넣고 재빌드/재배포하면 모든 CTA가 링크로 바뀝니다.
+- URL이 없고 `NEXT_PUBLIC_CONTACT_EMAIL`만 있으면 mailto로 연결됩니다.
+- 요청에 따라 공개 페이지의 문의 채널 준비 안내는 삭제했습니다.
 
-- 대학원생: 기존 Calendar의 변경·취소·권한 요청을 대신 처리하는 서비스를 이해할 수 있고, 비공식 관리자 문제에 연결됩니다. 과장된 절감 수치는 없습니다. 가장 큰 문의 장벽은 외부 운영자에게 권한을 맡기는 부담과 본인의 구매 권한 부족입니다.
-- PI / 연구실 관리자: 30만원으로 6주간 운영 대행을 검증하는 제안과 포함 범위를 이해할 수 있습니다. 실제 운영 부담이 적은 연구실에서는 필요성을 덜 느낄 수 있습니다. 과장된 ROI는 없으며, 가장 큰 문의 장벽은 지출에 비해 어떤 효과를 관찰할지 아직 확신하기 어렵다는 점입니다.
-
-## 남은 제한
-
-- 실제 문의 URL 또는 이메일, 공개 사이트 URL을 제공해야 합니다.
-- 원격 저장소와 Vercel 계정 연결이 필요합니다. 자격 증명은 채팅으로 공유하지 않습니다.
-- favicon은 임시 LS 모노그램입니다.
-- npm audit에서 린트 개발 의존성의 braces → micromatch → fast-glob → Next ESLint 경로에 high 5건이 보고되었습니다. Next 14로의 강제 다운그레이드는 적용하지 않았습니다. 런타임 패키지가 아닌 개발 도구 경로이며, upstream 수정 확인이 필요합니다.
-- Pretendard v1.3.9 공식 파일과 SIL OFL 라이선스를 포함했습니다. 출처: https://github.com/orioncactus/pretendard/tree/v1.3.9
+`NEXT_PUBLIC_SITE_URL`도 미설정입니다. 빌드는 성공하지만 Next.js는 OG 이미지 기준 주소로 localhost:3000을 사용합니다. 실제 도메인 설정 후 재빌드해야 합니다. Lighthouse 점수 및 실제 외부 문의 전송은 측정하지 않았습니다.
 
 ## 변경 파일
 
-모두 신규 파일입니다.
-
 ```
-.env.example
-.gitignore
-README.md
-package.json
-package-lock.json
-tsconfig.json
-next-env.d.ts
-eslint.config.mjs
-playwright.config.ts
-app/layout.tsx
 app/page.tsx
 app/globals.css
 app/opengraph-image.png
@@ -81,8 +59,7 @@ components/ContactCTA.tsx
 components/OperationDiagram.tsx
 lib/site-config.ts
 public/icon.svg
-public/fonts/PretendardVariable.woff2
-public/fonts/LICENSE.txt
 tests/landing.spec.ts
+README.md
 docs/verification.md
 ```

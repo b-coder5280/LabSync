@@ -23,12 +23,12 @@ npm start
 - `NEXT_PUBLIC_CONTACT_EMAIL`: URL이 없을 때 사용할 문의 이메일
 - `NEXT_PUBLIC_SITE_URL`: 실제 공개 사이트 URL, canonical과 Open Graph 기준 URL
 
-문의 값이 없거나 유효하지 않으면 CTA는 페이지 하단의 문의 채널 준비 안내로 이동합니다. 개발 화면에는 설정 TODO가 표시됩니다. 실제 문의 접수는 주소 설정 전까지 불가능합니다. 잘못된 URL 프로토콜은 허용하지 않습니다.
+문의 값이 없거나 유효하지 않으면 사용자의 요청에 따라 CTA 디자인을 유지한 비활성 버튼을 표시합니다. 가짜 주소나 접수 성공 메시지, 페이지 하단의 준비 안내는 표시하지 않습니다. 실제 Google Form URL을 `NEXT_PUBLIC_CONTACT_URL`에 설정한 뒤 재빌드/재배포하면 모든 CTA가 연결됩니다. URL이 없으면 이메일을 사용하며, 잘못된 URL 프로토콜은 허용하지 않습니다. `components/ContactCTA.tsx`에 설정 TODO를 남겼습니다.
 
 문구와 Pilot 조건은 `lib/site-config.ts`에서 수정합니다. Pretendard v1.3.9를 `public/fonts`에서 직접 제공하며 SIL Open Font License를 함께 포함합니다. 글꼴 로딩 중에는 시스템 한국어 글꼴을 사용합니다. `public/icon.svg`는 임시 LS 모노그램입니다.
 
 ## Vercel
 
-이 폴더를 GitHub 저장소에 연결하고 Vercel에서 Import합니다. Framework Preset은 Next.js, Root Directory는 저장소 루트, Build Command는 `npm run build`입니다. 위 공개 환경변수를 설정하고 배포합니다. 사용자 계정이나 저장소 URL이 제공되지 않아 원격 저장소 및 Vercel 연결은 자동 생성하지 않았습니다.
+Vercel에서 GitHub 저장소를 Import합니다. Framework Preset은 Next.js, Root Directory는 저장소 루트, Build Command는 `npm run build`입니다. 위 공개 환경변수를 설정하고 배포합니다.
 
 공개 전 실제 문의 목적지와 `NEXT_PUBLIC_SITE_URL`을 설정하고 CTA 전송 경로를 확인하세요. `.env.local` 및 `.vercel`은 Git에서 제외됩니다.

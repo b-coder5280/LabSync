@@ -1,14 +1,12 @@
 export function OperationDiagram() {
-  return <figure className="operation" aria-label="기존 Google Calendar의 변경, 취소, 권한, 오류 요청을 LabSync가 확인하고 처리한 뒤 결과를 검증합니다.">
-    <figcaption><span className="diagram-dot" />기존 Calendar, 새로운 운영 방식<span className="diagram-no">01 / 04</span></figcaption>
-    <div className="diagram-content">
-      <div className="calendar-node"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h3m2 0h3m-8 3h3"/></svg><div><strong>Google Calendar</strong><small>연구실이 쓰던 예약은 그대로</small></div><span className="tag">유지</span></div>
-      <div className="connector" aria-hidden="true">↓</div>
-      <div className="request-tags"><span>예약 변경</span><span>취소</span><span>권한</span><span>오류</span></div>
-      <div className="connector" aria-hidden="true">↓</div>
-      <div className="labsync-node"><span className="monogram">LS</span><strong>LabSync</strong><span>운영을 맡습니다</span></div>
-      <div className="connector" aria-hidden="true">↓</div>
-      <div className="verification"><span>✓ 확인</span><i aria-hidden="true"/><span>✓ 처리</span><i aria-hidden="true"/><span>✓ 결과 검증</span></div>
-    </div><div className="diagram-foot">연구실은 연구에. 운영 요청은 LabSync에.</div>
+  return <figure className="operation" aria-label="가상의 운영 예시: SEM-1 예약을 15시에서 16시로 변경하고 결과를 검증한 모습">
+    <figcaption><span className="example-line" aria-hidden="true" />OPERATION EXAMPLE<span>운영 예시</span></figcaption>
+    <div className="request-card">
+      <div className="request-heading"><span className="equipment-symbol" aria-hidden="true"><span /><span /><span /></span><div><span className="equipment-name">SEM-1</span><h2>예약 시간 변경</h2></div><span className="request-type">일정 변경</span></div>
+      <div className="time-change"><div className="time-before"><span>변경 전</span><time>15:00 — 16:00</time></div><div className="time-arrow" aria-hidden="true">↓</div><div className="time-after"><span>변경 후</span><time>16:00 — 17:00</time></div></div>
+      <div className="request-meta"><div><span className="meta-label">요청자</span><p>Researcher A</p></div><div className="request-status"><span className="meta-label">처리 상태</span><p><span className="status-dot" aria-hidden="true" />Verified <span className="verified-check" aria-hidden="true">✓</span></p></div></div>
+      <div className="request-result"><span aria-hidden="true">✓</span> Calendar 변경 결과 확인 완료</div>
+    </div>
+    <ol className="request-process" aria-label="예시 처리 과정"><li>요청 접수</li><li>권한 확인</li><li>Calendar 변경</li><li>결과 검증</li></ol>
   </figure>;
 }

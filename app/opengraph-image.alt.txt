@@ -1,1 +1,1 @@
-LabSync — 공용장비 Calendar 운영, 연구원이 직접 고치지 않게.
+LabSync — 공용장비 예약은 그대로. 운영 문제는 LabSync가 맡습니다.

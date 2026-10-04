@@ -1,33 +1,81 @@
 import { ContactCTA } from "@/components/ContactCTA";
 import { OperationDiagram } from "@/components/OperationDiagram";
 import { siteConfig as s } from "@/lib/site-config";
+
 const problems = [
-  ["예약 변경과 취소", "일정이 바뀔 때마다 누군가 직접 상태를 확인하고 수정합니다."],
-  ["신규 구성원 권한", "연구원이 들어오고 나갈 때 Calendar 접근 권한을 다시 설정해야 합니다."],
-  ["운영 오류", "동기화나 일정 상태에 문제가 생기면 결국 연구실 안의 누군가가 해결합니다."],
-  ["비공식 관리자", "본업이 연구인 사람이 시스템 운영까지 반복해서 맡게 됩니다."],
+  ["변경과 취소", "예약이 바뀔 때마다 누군가 현재 상태를 확인하고 다시 정리합니다."],
+  ["구성원 권한", "사람이 들어오고 나갈 때마다 Calendar 접근 권한을 관리해야 합니다."],
+  ["운영 오류", "문제가 생기면 결국 연구실 안의 누군가가 해결합니다."],
 ];
 const steps = [
-  ["Calendar는 그대로", "연구실은 기존 Google Calendar를 그대로 사용합니다."],
-  ["운영 요청 전달", "변경, 취소, 권한 등 운영 요청을 LabSync가 확인합니다."],
-  ["LabSync가 처리", "대상과 권한, 현재 상태를 확인한 뒤 필요한 작업을 처리합니다."],
-  ["결과 다시 확인", "변경 후 실제 Calendar 상태를 다시 확인합니다."],
+  ["요청", "변경·취소·권한 등 운영 요청을 전달합니다."],
+  ["확인", "요청자, 대상 Calendar, 현재 상태를 확인합니다."],
+  ["처리", "필요한 Calendar 작업을 LabSync가 수행합니다."],
+  ["검증", "실제 Calendar 상태를 다시 읽고 요청한 결과와 같은지 확인합니다."],
 ];
-const fit = ["여러 사용자가 여러 공용장비를 같이 사용한다", "Google Calendar를 예약에 사용한다", "전담 장비 운영 관리자나 IT 인력이 없다", "예약 수정·취소·권한 변경이 반복된다", "문제가 생기면 특정 연구원이 직접 해결한다"];
+
+function Wordmark() {
+  return <a className="wordmark" href="#" aria-label="LabSync 홈">Lab<span className="brand-link" aria-hidden="true" />Sync</a>;
+}
+
 export default function Home() {
   return <>
     <a className="skip-link" href="#main">본문으로 바로가기</a>
-    <header className="header"><div className="container header-inner"><a href="#" className="wordmark" aria-label="LabSync 홈"><span className="brand-symbol" aria-hidden="true">↳</span>LabSync<span className="brand-period">.</span></a><nav aria-label="주요 메뉴"><a href="#problem">문제</a><a href="#how-it-works">운영 방식</a><a href="#pilot">Paid Pilot</a><a href="#contact">문의</a></nav><ContactCTA /></div></header>
+    <header className="header">
+      <div className="container header-inner">
+        <Wordmark />
+        <nav aria-label="주요 메뉴"><a href="#problem">문제</a><a href="#how-it-works">운영 방식</a><a href="#pilot">Pilot</a></nav>
+        <ContactCTA label="6주 Pilot 문의" />
+      </div>
+    </header>
     <main id="main">
-      <section className="hero container" aria-labelledby="hero-title"><div className="hero-copy"><p className="eyebrow">SHARED-EQUIPMENT CALENDAR OPERATIONS</p><p className="audience">Google Calendar로 공용장비를 운영하는 연구실을 위해</p><h1 id="hero-title">공용장비<br className="desktop-break"/> Calendar 운영,<br/>연구원이 직접<br className="desktop-break"/> 고치지 않게.</h1><p className="hero-description">기존 Google Calendar는 그대로 사용하세요.<br/>예약 변경·취소, 권한 설정, 운영 중 발생하는 문제는 LabSync가 대신 처리합니다.</p><ContactCTA/><p className="offer-note">{s.pilotPrice} <span>·</span> 최대 {s.pilotCalendarLimit}개 Calendar <span>·</span> {s.pilotObservationPeriod}</p></div><OperationDiagram/><div className="hero-bottom"><span>기존 Calendar는 그대로.</span><span>반복되는 운영은 LabSync가 맡습니다.</span><span className="service-label">소프트웨어를 활용한 유료 운영 대행 서비스</span></div></section>
-      <section id="problem" className="section surface"><div className="container"><p className="eyebrow">01 / THE PROBLEM</p><div className="section-intro"><h2>예약은 Calendar가 하지만,<br/>운영은 결국 누군가의 일이 됩니다.</h2><p>공용장비가 늘고 사용자가 많아질수록 변경·취소·권한·오류 처리 같은 운영 업무가 쌓입니다. 전담 관리자가 없다면 그 일은 특정 대학원생이나 연구원에게 돌아갑니다.</p></div><div className="problem-grid">{problems.map(([title, text], i) => <article key={title}><span className="index">0{i + 1}</span><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>
-      <section className="section workflow-section"><div className="container"><p className="eyebrow">02 / TODAY’S WORKFLOW</p><h2>지금도 돌아가고 있습니다.<br/><span className="muted-heading">한 사람이 계속 개입하고 있을 뿐입니다.</span></h2><div className="workflow"><div className="workflow-tools">{["Google Calendar", "Sheets / Excel", "메신저", "구두 전달"].map((tool, i) => <div className="workflow-tool" key={tool}><span className="tool-symbol" aria-hidden="true">{["▦", "▤", "☰", "⋯"][i]}</span>{tool}{i < 3 && <span className="plus" aria-hidden="true">+</span>}</div>)}</div><div className="workflow-bridge"><span aria-hidden="true">↳</span><div><strong>비공식 관리자, 연구원 한 사람</strong><p>흩어진 요청을 연결하고, 확인하고, 직접 처리합니다.</p></div></div></div></div></section>
-      <section id="how-it-works" className="section surface"><div className="container"><p className="eyebrow">03 / HOW LABSYNC WORKS</p><h2>새 예약 시스템을 도입하는 대신,<br/>지금 쓰는 Calendar의 운영을 맡습니다.</h2><p className="section-description">사람이 요청을 확인하고 소프트웨어를 활용해 처리하는 운영 대행 서비스입니다.</p><ol className="steps">{steps.map(([title, text], i) => <li key={title}><span className="step-number">0{i + 1}</span><h3>{title}</h3><p>{text}</p></li>)}</ol></div></section>
-      <section className="section"><div className="container safety"><div><p className="eyebrow">04 / CAREFUL BY DESIGN</p><h2>Calendar를 대신 다루기 때문에,<br/>빠르게보다 정확하게 처리합니다.</h2></div><div className="safety-list">{[["권한 확인", "누가 요청했고 어떤 작업을 할 수 있는지 먼저 확인합니다."], ["범위 확인", "등록된 장비 Calendar와 요청 대상이 맞는지 확인합니다."], ["처리 후 재확인", "작업 후 실제 Calendar 상태가 요청한 결과와 같은지 다시 확인합니다."]].map(([title, text]) => <article key={title}><span className="check" aria-hidden="true">✓</span><div><h3>{title}</h3><p>{text}</p></div></article>)}</div></div></section>
-      <section className="section fit-section"><div className="container fit"><div><p className="eyebrow">05 / A GOOD FIT</p><h2>이런 연구실과<br/>첫 Pilot을 진행하려고 합니다.</h2><p className="section-description">연구실 규모보다 운영 복잡도가 더 중요합니다.</p></div><ul className="checklist">{fit.map(text => <li key={text}><span aria-hidden="true">✓</span>{text}</li>)}</ul></div></section>
-      <section id="pilot" className="section"><div className="container"><p className="eyebrow">06 / START WITH A PILOT</p><div className="pricing"><div className="pricing-summary"><h2>Paid Pilot v0</h2><p className="price">{s.pilotPrice}</p><p>초기 운영 검증을 위한 1회 Pilot</p><ContactCTA/><p className="no-renewal">한 번의 Pilot · 자동 갱신 없음</p></div><div className="pricing-detail"><h3>함께 확인할 운영 범위</h3><ul className="checklist"><li><span aria-hidden="true">✓</span>초기 설정 및 온보딩 포함</li><li><span aria-hidden="true">✓</span>최대 {s.pilotCalendarLimit}개의 공용장비 Google Calendar</li><li><span aria-hidden="true">✓</span>운영 시작 후 {s.pilotObservationPeriod} 운영 관찰</li><li><span aria-hidden="true">✓</span>{s.serviceHours}</li><li><span aria-hidden="true">✓</span>{s.ackTarget}</li></ul><p className="pricing-note">4시간은 해결 시간이 아닌 접수 확인 목표입니다.<br/>해결 시간은 요청 내용과 확인 과정에 따라 달라질 수 있으며, 보장하지 않습니다.</p></div></div></div></section>
-      <section className="section scope-section"><div className="container scope"><div><p className="eyebrow">07 / A FOCUSED SCOPE</p><h2>LabSync가 하지 않는 일</h2><p className="section-description">공용장비 Calendar 운영에 집중하도록,<br/>범위를 좁게 시작합니다.</p></div><ul>{["새로운 예약 화면으로 Calendar를 대체하지 않습니다", "연구실 전체 IT 관리를 맡지 않습니다", "Gmail / Drive / PC 관리 서비스가 아닙니다", "장비 유지보수나 재고 관리 시스템이 아닙니다", "연구 데이터 관리 서비스가 아닙니다"].map(text => <li key={text}>{text}</li>)}</ul></div></section>
-      <section id="contact" className="final-cta"><div className="container"><p className="eyebrow">KEEP THE CALENDAR. OFFLOAD THE OPERATIONS.</p><h2>연구실의 Calendar 운영,<br/>계속 한 사람이 맡고 있나요?</h2><p>현재 Google Calendar를 그대로 유지하면서<br/>반복되는 운영 업무를 줄일 수 있는지<br/>{s.pilotObservationPeriod} Paid Pilot으로 확인합니다.</p><ContactCTA/>{!s.contactHref && <div id="contact-status" className="contact-status" tabIndex={-1}><p>문의 채널을 준비 중입니다. 현재 온라인 문의는 접수되지 않습니다.</p>{process.env.NODE_ENV === "development" && <code>TODO: NEXT_PUBLIC_CONTACT_URL 또는 NEXT_PUBLIC_CONTACT_EMAIL을 설정하세요.</code>}</div>}</div></section>
-    </main><footer className="footer container"><a className="wordmark" href="#">LabSync<span className="brand-period">.</span></a><p>연구실 공용장비 Calendar 운영</p><span>© {new Date().getFullYear()} LabSync</span></footer>
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="container hero-layout">
+          <div className="hero-copy">
+            <p className="eyebrow">FOR GOOGLE CALENDAR–BASED LABS</p>
+            <h1 id="hero-title"><span>{s.headlineLead}</span><span>운영 문제는<br /><em>LabSync가</em> 맡습니다.</span></h1>
+            <p className="hero-description">Google Calendar를 바꾸지 않고,<br className="wide-break" /> 예약 변경·취소, 구성원 권한 설정, 운영 오류 대응을 대신 처리합니다.</p>
+            <p className="hero-purpose">연구원이 시스템 관리까지 맡지 않도록.</p>
+            <div className="hero-action"><ContactCTA /><p className="offer-note"><strong>{s.pilotPrice}</strong><span>·</span> 최대 {s.pilotCalendarLimit}개 Calendar <span>·</span> {s.pilotObservationPeriod}</p></div>
+          </div>
+          <OperationDiagram />
+        </div>
+      </section>
+
+      <section id="problem" className="section problem-section" aria-labelledby="problem-title">
+        <div className="container">
+          <div className="section-intro"><h2 id="problem-title">문제는 예약이 아니라,<br />예약 뒤의 운영입니다.</h2><p>Google Calendar는 예약을 기록합니다.<br />하지만 변경, 취소, 권한 설정, 오류가 생기면<br className="wide-break" /> 누군가는 직접 확인하고 해결해야 합니다.</p></div>
+          <div className="problem-list">{problems.map(([title, text], i) => <article key={title}><span className="index">0{i + 1}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
+          <figure className="workflow-comparison">
+            <div className="workflow-current"><p className="workflow-label">지금의 운영</p><div className="tool-chain"><span>Calendar</span><b>+</b><span>Sheet</span><b>+</b><span>메신저</span><b>+</b><span>구두 요청</span></div><div className="workflow-funnel" aria-hidden="true"><span>↓</span></div><div className="researcher"><span className="person-icon" aria-hidden="true" /><strong>한 명의 연구원</strong><span>비공식 관리자</span></div></div>
+            <div className="workflow-arrow" aria-hidden="true">→</div>
+            <div className="workflow-with"><p className="workflow-label">LabSync와 함께</p><div className="new-workflow"><span className="calendar-icon" aria-hidden="true" /><strong>Google Calendar</strong><span className="workflow-plus">+</span><span className="operations-mark">L<span>↗</span></span><strong>LabSync <small>Operations</small></strong></div></div>
+            <figcaption>도구를 하나 더 추가하는 것이 아니라,<br className="mobile-break" /> 사람에게 몰려 있던 운영을 분리합니다.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="section how-section" aria-labelledby="how-title">
+        <div className="container">
+          <h2 id="how-title">Calendar를 바꾸지 않고,<br />운영 방식만 바꿉니다.</h2>
+          <ol className="timeline">{steps.map(([title, text], i) => <li key={title}><span className="timeline-point">0{i + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol>
+          <aside className="trust-strip" aria-label="운영 확인 원칙"><p>운영을 대신하는 만큼,<br />처리보다 확인을 먼저 합니다.</p><ul>{["권한 확인", "등록 범위 확인", "처리 후 재확인"].map(text => <li key={text}><span aria-hidden="true">✓</span>{text}</li>)}</ul></aside>
+        </div>
+      </section>
+
+      <section id="pilot" className="section pilot-section" aria-labelledby="pilot-title">
+        <div className="container">
+          <div className="pilot-offer">
+            <div className="pilot-summary"><h2 id="pilot-title">6주 Paid Pilot</h2><p className="price">{s.pilotPrice}</p><p className="pilot-description">실제 운영 부담과 반복 업무가 있는지<br />함께 확인하기 위한 초기 Pilot입니다.</p><ContactCTA label="Pilot 문의하기" /></div>
+            <div className="pilot-details"><h3>포함되는 내용</h3><ul className="included-list">{["초기 설정 및 온보딩", `최대 ${s.pilotCalendarLimit}개 공용장비 Google Calendar`, `운영 시작 후 ${s.pilotObservationPeriod} 운영 관찰`, s.serviceHours, s.ackTarget, "자동 갱신 없음"].map(text => <li key={text}><span aria-hidden="true">✓</span>{text}</li>)}</ul><p className="pilot-note">4시간은 해결 시간이 아닌 접수 확인 목표입니다.<br />처리 시간은 요청 내용과 확인 과정에 따라 달라지며, 보장하지 않습니다.</p></div>
+          </div>
+          <div className="pilot-fit"><h3>이런 연구실을 찾고 있습니다.</h3><ul>{["여러 사람이 공용장비를 함께 사용", "Google Calendar로 예약 관리", "전담 운영 관리자 없음", "변경·취소·권한 요청이 반복됨"].map(text => <li key={text}>{text}</li>)}</ul><p>연구실 규모보다 운영 복잡도가 중요합니다.</p></div>
+          <div className="scope-note"><h3>서비스 범위</h3><p>LabSync는 현재 공용장비 Google Calendar 운영에 집중합니다.<br />연구실 전체 IT 관리, 장비 유지보수, 연구 데이터 관리 서비스는 제공하지 않습니다.</p></div>
+        </div>
+      </section>
+
+      <section id="contact" className="final-cta" aria-labelledby="contact-title"><div className="container final-layout"><div><p className="final-label">Keep the Calendar.<br />Offload the operations.</p><h2 id="contact-title">공용장비 운영,<br />계속 한 사람이 맡고 있나요?</h2></div><div className="final-action"><p>반복되는 운영 업무를 줄일 수 있는지,<br />6주 Pilot으로 확인해 보세요.</p><ContactCTA label="6주 Pilot 문의하기" /></div></div></section>
+    </main>
+    <footer className="footer container"><Wordmark /><p>Google Calendar operations for shared-equipment labs.</p><span>© 2026 LabSync</span></footer>
   </>;
 }
