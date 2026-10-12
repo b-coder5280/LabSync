@@ -1,1 +1,1 @@
-LabSync — 공용장비 예약은 그대로. 운영 요청은 LabSync로.
+LabSync — PI·연구실 책임자를 위한 공용장비 Google Calendar 운영 지원

@@ -9,7 +9,7 @@ for (const width of [375, 768, 1440]) {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
-    await expect(page.locator('h1')).toHaveText('장비 예약은 그대로,운영은 더간단하게.');
+    await expect(page.locator('h1')).toContainText('공용장비 운영 부담은');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.getByRole('button', { name: 'Google로 로그인', exact: true })).toBeEnabled();
@@ -26,7 +26,7 @@ for (const width of [375, 768, 1440]) {
       await menu.click();
       await expect(page.getByRole('button', { name: '메뉴 닫기' })).toHaveAttribute('aria-expanded', 'true');
       await page.getByRole('navigation').getByRole('link', { name: '파일럿 안내' }).click();
-      await expect(page.getByRole('navigation')).toBeHidden();
+      await expect(page.locator('#main-navigation')).toBeHidden();
       await expect(page).toHaveURL(/#pilot$/);
     }
     await page.locator('.secondary-button').click();

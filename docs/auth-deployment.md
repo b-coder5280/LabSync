@@ -1,5 +1,15 @@
 # Google 로그인 및 Vercel 배포
 
+> 2026-10-11 갱신: 아래 10/10 진단은 당시 기록이다. 이번 공개 운영 검사에서는 Google popup이 실제 열리고 취소 안내가 표시됐다. 현재 scope/정확한 환경변수는 [Google 준비 안내](google-oauth-readiness.md), 새 카카오 서버 변수는 [카카오 설정](kakao-login-setup.md)을 우선 참고한다. 문의 CTA의 운영 미연결은 코드 fallback으로 수정했으나 아직 새 배포 전이다. 아래 “관리자 키 불필요” 설명은 Google 로그인에 해당하며 선택적 카카오 custom-token 서버에는 별도 credential이 필요하다.
+
+## 현재 운영 배포 진단 (2026-10-10 재확인)
+
+사용자가 Vercel `labsync` → Settings → Domains에서 `labsync-pink.vercel.app` 연결을 확인했습니다. 운영 사이트에서 Next.js `/_next/` 스크립트와 변경된 홈페이지·Google 로그인 버튼을 직접 확인했습니다. 버튼을 누르면 **"Google 로그인 연결을 준비 중입니다. 파일럿 안내는 아래에서 확인해 주세요."**가 표시됩니다.
+
+이 문구는 `components/AuthControl.tsx`의 `!firebaseConfigured` 분기이며, Firebase 요청을 보내기 전에 종료됩니다. `lib/firebase-client.ts`는 아래 네 `NEXT_PUBLIC_FIREBASE_*` 값이 모두 있어야 초기화합니다. 사용자가 확인한 Vercel의 `No Environment Variables Added`와 일치하는 환경변수 누락 문제입니다. Firebase 콘솔의 `CONFIGURATION_NOT_FOUND` 안내는 뒷문장이 다른 별도 오류입니다.
+
+현재 운영 배포에 로그인 구현이 있으므로 이번 문제에는 추가 인증 코드 수정이 필요하지 않습니다. 아래 네 Firebase 값을 **Production** 환경으로 저장하고, 해당 코드가 포함된 현재 Production 배포를 **Redeploy하여 다시 빌드**합니다. 기존 산출물을 단순 재사용하거나 다른 Preview 배포를 Promote하는 것으로 대체하지 않습니다. 재배포 후 로그인 팝업이 열리는지 확인합니다. Next.js의 공개 환경변수는 빌드 시 포함되므로 환경변수 저장만으로 기존 화면이 변경되지는 않습니다.
+
 ## 사용 중인 구성
 
 - Firebase 프로젝트: `labsync-80acb`
@@ -54,4 +64,4 @@ Vercel Dashboard → 해당 LabSync 프로젝트 → Settings → Environment Va
 
 현재 공개 요청 체험에는 실제 전송·데이터 접근 기능이 없습니다. 로그인·로그아웃과 무관하게 공개 예시는 볼 수 있지만 실제 연구실 접근은 제공되지 않습니다. 기존 DB나 API가 없으므로 이번 작업에서 서버/DB 권한 보호를 검증했다고 주장하지 않습니다. 향후 보호 자원 추가 전 서버에서 Firebase ID token의 서명·issuer·audience·만료와 UID별 membership을 검증하고, 로그아웃/권한 철회 정책도 함께 구현해야 합니다.
 
-현재 실행 환경에 Vercel 프로젝트 연결, 인증된 CLI 또는 연결된 관리자 브라우저가 없어 Production 환경변수의 실제 저장값 조회·등록이나 배포는 수행하지 않았습니다. 공개 운영 사이트를 다시 확인했으며 아직 이전 홈페이지로 로그인 버튼이 없습니다. 따라서 Firebase 설정 완료와 별개로 위 환경변수를 확인하고 새 코드를 Vercel에 배포해야 합니다. `.env.local`의 authDomain·projectId·appId·사이트 주소·문의 이메일은 위 값과 일치하고 API key는 HTTP 200 조회에 사용되었습니다.
+현재 실행 환경에 Vercel 프로젝트 연결, 인증된 CLI 또는 연결된 관리자 브라우저가 없어 Production 환경변수의 실제 저장값 조회·등록이나 배포는 수행하지 않았습니다. 사용자 확인으로 `labsync`의 환경변수가 비어 있고 운영 도메인이 이 프로젝트에 연결됨을 확인했습니다. 공개 사이트에는 이제 로그인 구현이 배포되어 있으며, 직접 누른 결과 환경변수 누락 분기로 진입합니다. `.env.local`의 authDomain·projectId·appId·사이트 주소·문의 이메일은 위 값과 일치하고 API key는 HTTP 200 조회에 사용되었습니다.

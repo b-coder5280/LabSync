@@ -21,14 +21,16 @@ npm run start -- --port 3100
 
 ## 설정과 배포
 
-환경변수 이름은 [.env.example](.env.example), 실제 프로젝트의 값과 Firebase·Vercel 메뉴 및 검증 절차는 [인증 및 배포 안내](docs/auth-deployment.md)에 정리되어 있습니다. `NEXT_PUBLIC_*` 값은 브라우저에 공개되며 빌드 시 반영되므로 변경 후 재배포해야 합니다. 관리자 credential, 서비스 계정 키, Google client secret은 필요하지 않습니다.
+환경변수 이름은 [.env.example](.env.example), 설정 절차는 [Google 준비 안내](docs/google-oauth-readiness.md)에 있습니다. `NEXT_PUBLIC_*` 값은 빌드 시 브라우저에 공개되므로 변경 후 새 빌드가 필요합니다. Google 로그인에는 관리자 credential이 필요 없습니다. 선택적인 카카오 로그인은 [서버 설정](docs/kakao-login-setup.md)이 필요하며 기본 비활성입니다.
 
-`NEXT_PUBLIC_CONTACT_URL`이 유효하면 우선 사용하고, 없으면 `NEXT_PUBLIC_CONTACT_EMAIL`을 사용합니다. 둘 다 없으면 문의 준비 상태 안내로 이동하며 접수 성공을 표시하지 않습니다.
+`NEXT_PUBLIC_CONTACT_URL`이 유효하면 우선 사용하고, 없으면 `NEXT_PUBLIC_CONTACT_EMAIL`을 사용합니다. 이메일 설정도 없으면 대표자가 승인한 `dongbeen@gm.gist.ac.kr`로 연결합니다. 메일 앱 실행은 접수 완료가 아닙니다.
 
 ## 인증과 권한
 
-Firebase SDK가 계정의 안정적인 `uid`와 세션을 관리합니다. 로그인 상태는 브라우저의 local persistence로 복원되고, 토큰 변경과 다른 탭의 로그인·로그아웃을 구독합니다. 별도 사용자 DB나 자체 토큰 저장 코드는 없습니다. 화면에서는 이름과 이메일만 표시합니다.
+Firebase SDK가 계정의 안정적인 `uid`와 세션을 관리합니다. 로그인 상태는 local persistence로 복원되며 다른 탭의 로그인·로그아웃도 구독합니다. 별도 사용자 DB는 없습니다. 선택적인 카카오 서버 흐름은 검증된 제공업체 ID로 Firebase custom token을 발급하고 단기 암호화 쿠키로 전달합니다. 화면에서는 이름과 제공된 이메일만 표시합니다.
 
-로그인은 연구실 사용 권한을 부여하지 않습니다. 현재 저장소에는 회원별 데이터, DB, 보호 API, 고객 포털이 없으므로 새 사용자에게 연결되는 연구실도 없습니다. 계정 패널에는 이용 권한 확인 전 상태를 표시합니다. 추후 데이터 API를 추가할 때에는 서버의 토큰 검증과 UID 기반 연구실 membership 확인이 먼저 필요합니다. 클라이언트 로그인 상태만으로 권한을 판정해서는 안 됩니다.
+로그인은 연구실 사용 권한을 부여하지 않습니다. 현재 회원별 연구실 데이터·DB·고객 포털은 없으며 계정 패널에 이용 권한 확인 전 상태를 표시합니다. 향후 고객 데이터 API에는 서버 토큰 검증과 UID 기반 membership 검사가 먼저 필요합니다. 카카오 OAuth API는 state·Origin·만료 검사를 별도로 수행합니다.
+
+10월 14일 작업 상태·승인 경계·시연 순서는 [준비 보고서](docs/oct14-readiness.md), 대표자 설정은 [체크리스트](docs/founder-actions.md)를 참고하세요. 정책은 승인 전 초안이며 분석 수집은 기본 비활성입니다. 이번 수정본은 Production에 배포하지 않았습니다.
 
 문구와 파일럿 조건은 `lib/site-config.ts`에서 관리합니다. Pretendard는 `public/fonts`에서 직접 제공하고 라이선스를 함께 보관합니다. 변경 및 검증 내역은 [검증 보고서](docs/verification.md)를 참고하세요.

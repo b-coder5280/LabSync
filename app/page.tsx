@@ -1,5 +1,7 @@
 import { SiteHeader } from "@/components/SiteHeader";
-import Link from "next/link";
+import { SiteFooter } from '@/components/SiteFooter';
+import { faqs } from '@/lib/public-content';
+import { canonicalOrigin, structuredData } from '@/lib/seo';
 import { ContactCTA } from "@/components/ContactCTA";
 import { RequestAssistant } from "@/components/RequestAssistant";
 import { siteConfig as s } from "@/lib/site-config";
@@ -17,16 +19,18 @@ const usageSteps = [
   ["LabSync 처리", "운영자가 권한과 현재 상태를 확인한 뒤 필요한 Calendar 작업을 처리합니다."],
   ["결과 확인", "작업 후 실제 Calendar 상태를 다시 확인하고 요청자에게 결과를 알려줍니다."],
 ];
-function Wordmark() {
-  return <Link className="wordmark" href="/" aria-label="LabSync 홈">Lab<span className="brand-link" aria-hidden="true" />Sync</Link>;
-}
 export default function Home() {
   return <>
     <a className="skip-link" href="#main">본문으로 바로가기</a>
     <SiteHeader />
     <main id="main">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData({ '@context': 'https://schema.org', '@graph': [
+        { '@type': 'Organization', '@id': canonicalOrigin() + '/#organization', name: 'LabSync', url: canonicalOrigin(), email: 'dongbeen@gm.gist.ac.kr', founder: { '@type': 'Person', name: '이동빈' } },
+        { '@type': 'Service', name: '공용장비 Google Calendar 운영 지원', serviceType: '연구실 공용장비 운영 지원', provider: { '@id': canonicalOrigin() + '/#organization' }, description: s.description },
+        { '@type': 'FAQPage', mainEntity: faqs.map(([question, answer]) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })) },
+      ] }) }} />
       <section className="hero" aria-labelledby="hero-title"><div className="container hero-layout">
-        <div className="hero-copy"><p className="eyebrow">Shared Equipment Operations</p><h1 id="hero-title"><span>장비 예약은 그대로,</span><span>운영은 더<br /><em>간단하게.</em></span></h1><div className="hero-description"><p>기존 Google Calendar를 유지하면서 예약 변경, 접근 권한, 운영 오류 대응에 드는 연구실의 수작업을 줄입니다.</p></div><div className="hero-action"><div className="hero-buttons"><ContactCTA /><a className="secondary-button" href="#how-it-works">운영 방식 보기 <span aria-hidden="true">↓</span></a></div><p className="offer-note">6주 유료 파일럿 <span>·</span> 기존 Calendar 그대로</p></div></div>
+        <div className="hero-copy"><p className="eyebrow">Shared Equipment Operations</p><p className="hero-buyer">PI·연구실 책임자를 위한 공용장비 운영 지원</p><h1 id="hero-title"><span>예약 방식은 그대로,</span><span>공용장비 운영 부담은<br /><em>LabSync로.</em></span></h1><div className="hero-description"><p>기존 Google Calendar를 유지하면서 예약 변경·취소, 접근 권한, 운영 오류 대응을 지원합니다. 반복되는 운영을 맡기고 연구에 집중하세요.</p></div><div className="hero-action"><div className="hero-buttons"><ContactCTA /><a className="secondary-button" href="#how-it-works">운영 방식 보기 <span aria-hidden="true">↓</span></a></div><p className="offer-note">₩300,000 <span>·</span> 최대 5개 Calendar <span>·</span> 운영 시작 후 6주</p><p className="buyer-note">온보딩 포함 · 자동 갱신 없음</p></div></div>
         <figure className="operations-visual" aria-label="기존 Google Calendar에 LabSync 운영 지원을 더하는 방식"><div className="visual-heading"><span>YOUR LAB, IN SYNC</span><span className="visual-tag">운영 구조</span></div><div className="calendar-block"><div className="calendar-symbol" aria-hidden="true">31</div><div><p>예약은 익숙한 곳에서</p><h2>기존 Google Calendar</h2></div></div><div className="connection-line" aria-hidden="true"><span>+</span></div><div className="operations-block"><div className="operations-title"><span className="ls-symbol" aria-hidden="true">LS</span><div><p>반복되는 운영은 함께</p><h2>LabSync 운영 지원</h2></div></div><ul><li><span>01</span>예약 변경·취소<span aria-hidden="true">↗</span></li><li><span>02</span>접근 권한 관리<span aria-hidden="true">↗</span></li><li><span>03</span>운영 오류 대응<span aria-hidden="true">↗</span></li></ul><p className="visual-process">요청 확인 <span>→</span> 운영자 처리 <span>→</span> 결과 검증</p></div><figcaption>예약 도구를 바꾸지 않고, 운영 부담을 나눕니다.</figcaption></figure>
       </div></section>
 
@@ -46,7 +50,8 @@ export default function Home() {
       </div><div className="scope-note"><h3>서비스 범위</h3><p>공용장비 Google Calendar 운영에 집중합니다.<br />연구실 전체 IT 관리, 장비 유지보수, 연구 데이터 관리는 제공하지 않습니다.</p></div></div></section>
 
       <section id="contact" className="final-cta" aria-labelledby="contact-title"><div className="container final-layout"><div><p className="final-label">Keep the Calendar.<br />Offload the operations.</p><h2 id="contact-title">공용장비 운영,<br />계속 한 사람이 맡고 있나요?</h2></div><div className="final-action"><p>기존 Google Calendar를 그대로 유지하면서<br />반복되는 운영 요청을 LabSync로 분리할 수 있는지<br />6주 Pilot으로 확인해 보세요.</p><ContactCTA />{!s.contactHref && <p id="contact-status" className="contact-status">파일럿 문의 채널을 준비 중입니다. 현재 이 홈페이지에서는 문의를 접수하지 않습니다.</p>}</div></div></section>
+      <section id="faq" className="section faq-section"><div className="container faq-grid"><div><p className="eyebrow">BEFORE YOUR PILOT</p><h2>도입 전에<br />궁금한 점</h2></div><div>{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></div></section>
     </main>
-    <footer className="footer container"><Wordmark /><p>Google Calendar operations for shared-equipment labs.</p><span>© 2026 LabSync</span></footer>
+    <SiteFooter />
   </>;
 }

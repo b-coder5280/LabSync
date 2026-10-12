@@ -4,7 +4,8 @@ function httpUrl(value: string | undefined) {
 }
 const contactUrl = httpUrl(process.env.NEXT_PUBLIC_CONTACT_URL);
 const rawEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
-const contactEmail = rawEmail && /^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$/.test(rawEmail) ? rawEmail : undefined;
+// Founder-approved public contact; keep the primary CTA working without optional env configuration.
+const contactEmail = rawEmail && /^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$/.test(rawEmail) ? rawEmail : 'dongbeen@gm.gist.ac.kr';
 export const siteConfig = {
   brandName: "LabSync",
   title: "LabSync | 연구실 공용장비 Google Calendar 운영",

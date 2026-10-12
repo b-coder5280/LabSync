@@ -1,0 +1,7 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { SiteFooter } from '@/components/SiteFooter';
+export const metadata: Metadata = { title: '파일럿 이용 안내 초안 | LabSync', description: 'LabSync Paid Pilot의 제공 범위와 계약 전 확인 사항입니다.', alternates: { canonical: '/terms' }, robots: { index: false, follow: true } };
+export default function Terms() {
+  return <><main className="legal-page container"><Link href="/">← LabSync 홈페이지</Link><p className="eyebrow">Paid Pilot v0</p><h1>파일럿 이용 안내</h1><p className="draft-notice">승인 전 초안 · 계약 체결 또는 결제 동의 화면이 아닙니다.</p><section><h2>제공 범위</h2><p>기존 Google Calendar 기반 공용장비 예약 변경·취소, 접근 권한, 운영 오류 대응을 지원합니다. 신규 예약 시스템, 장비 유지보수, 연구실 전체 IT 관리, 연구 데이터 관리는 포함하지 않습니다.</p></section><section><h2>파일럿 조건</h2><ul><li>₩300,000</li><li>최대 공용장비 Google Calendar 5개</li><li>최초 온보딩 포함</li><li>운영 시작(Go-live) 후 6주</li><li>자동 갱신 없음</li></ul><p>월–금 09:00–18:00 KST 운영, 영업시간 기준 4시간 이내 접수 확인 목표입니다. 해결 시간이나 절감 성과를 보장하지 않습니다.</p></section><section><h2>신청과 운영</h2><p>문의만으로 계약이나 결제가 발생하지 않습니다. 운영 범위·권한·시작일을 상담한 후 별도로 합의합니다. 홈페이지의 요청 체험은 전송되지 않습니다.</p></section><section><h2>계약 전에 확정할 내용</h2><p>사업자 정보, 세금 포함 여부, 결제 방식, 취소·중도 종료·환불 기준, 작업 승인 절차와 책임 범위는 대표자가 확인·승인해야 합니다. 미확정 조건으로 실결제를 받지 않습니다.</p></section><section><h2>문의</h2><p>대표 이동빈 · <a href="mailto:dongbeen@gm.gist.ac.kr">dongbeen@gm.gist.ac.kr</a></p><Link href="/privacy">개인정보처리방침 초안</Link></section></main><SiteFooter /></>;
+}

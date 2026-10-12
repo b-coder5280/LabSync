@@ -59,6 +59,10 @@ Next.js App Router + React + TypeScript, Pretendard 로컬 폰트, 직접 작성
 
 ## 남은 배포 작업과 의존성
 
-Firebase 초기화·Google 제공업체·허용 도메인 설정은 확인되었습니다. 남은 작업은 Vercel Production 환경변수 확인과 새 코드 배포입니다. 이 실행 환경에는 인증된 Vercel CLI/프로젝트 연결이나 관리자 브라우저가 없어 Production 저장값 조회나 배포를 수행하지 않았습니다. 공개 운영 사이트에는 아직 이전 코드가 표시됩니다. 정확한 값과 단계는 [인증 및 배포 안내](auth-deployment.md)를 참고하세요.
+Firebase 초기화·Google 제공업체·허용 도메인 설정은 확인되었습니다. 2026-10-10 후속 검사에서 공개 운영 사이트에 최신 디자인과 로그인 버튼이 배포된 것을 확인했습니다. 버튼을 누르면 환경변수 누락 안내가 나타납니다. 사용자는 Vercel `labsync` 프로젝트의 환경변수가 비어 있고 Domains에 `labsync-pink.vercel.app`이 표시됨을 확인했습니다. 남은 작업은 이 프로젝트의 Production 환경변수 등록과 재빌드·재배포입니다. 이번 원인에 대한 추가 인증 코드 수정은 필요하지 않습니다. 관리자 연결이 없어 환경변수 등록이나 재배포 자체는 수행하지 않았습니다. 정확한 값과 단계는 [인증 및 배포 안내](auth-deployment.md)를 참고하세요.
 
 `npm audit`은 high 9건을 보고했습니다. 4건은 Firebase 패키지에 포함되지만 이 앱에서 import/사용하지 않는 Firestore의 gRPC 경로이며, 5건은 ESLint의 glob 개발 의존성 경로입니다. 취약점이 없다고 주장하지 않습니다. audit의 자동 제안은 Firebase/Next ESLint를 이전 major로 내리는 변경이므로 적용하지 않았습니다. 실제 사용 범위와 호환성을 검토해 별도 의존성 업데이트가 필요합니다.
+# 2026-10-11 추가 작업
+
+최신 통합 결과는 [10/14 준비 보고서](oct14-readiness.md)를 참고한다. 기존 Google 흐름 유지, 선택적 카카오 서버 인증 코드, 기본 비활성 분석 동의, SEO·정책 초안·디자인·이메일 fallback을 추가했다. build/lint/typecheck 통과, 기본 Playwright 10 passed/5 skipped, 별도 Kakao route 및 analytics fixture 각각 1 passed. 마지막 태블릿 줄바꿈 수정 후 768px 회귀도 1 passed. 새 코드 Production 배포는 하지 않았다. 아래 기존 기록과 최신 운영 popup 검증 결과를 구분한다.
+

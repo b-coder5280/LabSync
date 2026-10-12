@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { GoogleAuthProvider, onIdTokenChanged, signInWithPopup, signOut, type User, type Auth } from "firebase/auth";
 import { firebaseConfigured, prepareAuth } from "@/lib/firebase-client";
 import { authErrorMessage } from "@/lib/auth-errors";
+import { track } from "@/lib/analytics-client";
 
 function GoogleIcon() {
   return <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6C44.4 38.03 46.98 31.87 46.98 24.55Z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.78-4.59l-7.98-6.19A23.87 23.87 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.92 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>;
@@ -15,10 +16,17 @@ export function AuthControl() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [open, setOpen] = useState(false);
+  const [kakaoEnabled, setKakaoEnabled] = useState(false);
   const auth = useRef<Auth | null>(null);
   const locked = useRef(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/auth/kakao/status', { signal: controller.signal }).then(response => response.json()).then(result => setKakaoEnabled(result.enabled === true)).catch(() => {});
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     let disposed = false;
@@ -63,11 +71,13 @@ export function AuthControl() {
     locked.current = true;
     setBusy(true); setMessage("");
     const provider = new GoogleAuthProvider();
+    track('login_start', 'google');
     provider.setCustomParameters({ prompt: "select_account" });
     try {
       // Popup keeps the exact page, query and hash; no untrusted return URL.
       // GoogleAuthProvider only requests identity scopes, never Calendar scopes.
       await signInWithPopup(auth.current, provider);
+      track('login_success', 'google');
       setOpen(true);
     } catch (error) { setMessage(authErrorMessage(error)); }
     finally { locked.current = false; setBusy(false); }
@@ -80,11 +90,11 @@ export function AuthControl() {
     finally { locked.current = false; setBusy(false); }
   }
 
-  return <div className="auth-control" ref={root}>
+  return <div className="auth-control" ref={root} data-clarity-mask="true">
     {user ? <>
       <button ref={trigger} type="button" className="auth-button" aria-expanded={open} aria-controls="account-panel" onClick={() => setOpen(!open)}><span className="avatar" aria-hidden="true">{(user.displayName || "사용자").slice(0, 1)}</span><span className="account-name">{user.displayName || "내 계정"}</span><span aria-hidden="true">⌄</span></button>
       {open && <div id="account-panel" className="account-panel"><strong>{user.displayName || "Google 계정"}</strong><p className="account-email">{user.email}</p><div className="access-notice"><strong>이용 권한 확인 전</strong><p>로그인이 완료되었습니다. 연구실 이용 권한은 별도로 확인하며, 현재 연결된 연구실 데이터는 없습니다.</p></div><button className="auth-button" type="button" disabled={busy} onClick={logout}>{busy ? "로그아웃 중…" : "로그아웃"}</button></div>}
-    </> : <button ref={trigger} type="button" className="auth-button" disabled={busy || (firebaseConfigured && !ready)} onClick={login}><GoogleIcon /><span>{busy ? "로그인 중…" : firebaseConfigured && !ready ? "계정 확인 중…" : "Google로 로그인"}</span></button>}
+    </> : <div className="signin-options"><button ref={trigger} type="button" className="auth-button" disabled={busy || (firebaseConfigured && !ready)} onClick={login}><GoogleIcon /><span>{busy ? "로그인 중…" : firebaseConfigured && !ready ? "계정 확인 중…" : "Google로 로그인"}</span></button><button className="signin-more" type="button" aria-label="다른 로그인 방법" aria-expanded={open} aria-controls="signin-panel" onClick={() => setOpen(!open)}>⌄</button>{open && <div className="account-panel" id="signin-panel"><strong>로그인 방법</strong>{kakaoEnabled ? <a className="kakao-button" href="/api/auth/kakao/start" onClick={event => { event.preventDefault(); track('login_start', 'kakao'); const target = new URL('/api/auth/kakao/start', location.origin); target.searchParams.set('returnTo', location.pathname + location.search + location.hash); location.assign(target.href); }}>카카오로 로그인</a> : <p className="access-notice">카카오 로그인 준비 중<br /><small>현재 Google 로그인을 이용해 주세요.</small></p>}<p className="account-email">로그인은 파일럿 신청이나 연구실 접근 권한을 자동으로 부여하지 않습니다.</p></div>}</div>}
     {message && <div className="auth-message" role="status"><p>{message}</p><button type="button" aria-label="로그인 알림 닫기" onClick={() => setMessage("")}>닫기</button></div>}
   </div>;
 }
