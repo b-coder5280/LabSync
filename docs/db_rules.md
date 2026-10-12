@@ -1,5 +1,19 @@
 # 저장소와 권한 감사
 
+## 2026-10-12 갱신
+
+대표자가 **Emulator 구현만 승인**했다. 운영 Firebase DB는 생성하지 않았다. `demo-labsync-intake`의 로컬 Firestore(127.0.0.1:8085)/Auth(9095)만 사용한다. 아래 “DB 없음/N/A”는 기존 운영 상태이며 새 로컬 문의 테스트와 구분한다.
+
+최소 schema: `pilotInquiries/{UUID}`에 email/name?/organization?/calendarCount/message/consent/consentVersion/createdAt/status=Submitted/testOnly/payloadHash. `intakeLimits/{HMAC(email+hour) 또는 global-minute}`에 count만 저장. users/lab membership/operationalRequests는 만들지 않는다. 메일·이름·내용을 URL/analytics/log에 기록하지 않는다.
+
+`firestore.rules`는 모든 클라이언트 read/write를 거부한다. 서버 POST만 schema·Origin·암호화 challenge·최소시간·honeypot·크기·동의·idempotency·transaction rate-limit 검사 후 생성. GET은 Auth Emulator ID token 검증과 admin claim을 요구하며 최근20건만 반환한다. 실제 운영용 admin provisioning/IAM/retention 정책은 미구현·미승인. Admin SDK가 Rules를 우회하므로 서버 검사와 Rules를 둘 다 테스트했다.
+
+`npm run test:inquiry`: scripts/test-inquiry-emulator.mjs로 실제 문서 commit을 확인한17검사. 익명/타사용자/가짜 client admin 직접 읽기·쓰기·users role 생성·타 lab 경로 모두 거부. 실제 lab data 격리가 아닌 deny-all 확인이다. 모의 DB adapter 대신 실제 Emulator 사용, 운영 writes0. Auth Emulator는 서명 안전성을 운영 수준으로 증명하지 않는다.
+
+실행 준비: `npm install --prefix artifacts/emulator-tools firebase-tools @firebase/rules-unit-testing`, Java21 PATH 설정 후 해당 firebase CLI `emulators:start --only firestore,auth --project demo-labsync-intake --config firebase.json`. 별도 Next process에 `.env.example`의 localhost Emulator 변수와 INQUIRY_MODE=emulator 설정. VERCEL 환경 또는 정해진127.0.0.1/ demo project 이외 경로는 실패하도록 고정. 운영 배포에 이 변수를 넣지 않는다. 내보내기 없이 Emulator 종료 시 가상 데이터 삭제. live 전환은 별도 설계/리소스 승인 및 정책 확정 후 새 코드가 필요하다.
+
+---
+
 2026-10-11. 상태: 코드 감사 및 OAuth 경계 TESTED_LOCAL. 연구실 DB 격리 테스트는 적용 대상 없음이며 통과로 보고하지 않는다.
 
 실제 코드에는 Firestore/Realtime Database/SQL 연결, 연구실 컬렉션, CRUD API, 관리자 화면이 없다. Firebase는 Authentication만 사용한다. Firebase Console에 별도 데이터베이스가 있는지는 관리자 접근이 없어 미확인: 대표자가 확인해야 한다. 저장소에 없는 배포 규칙을 안전하다고 추정하지 않는다.

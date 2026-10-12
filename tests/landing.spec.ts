@@ -9,13 +9,13 @@ for (const width of [375, 768, 1440]) {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
-    await expect(page.locator('h1')).toContainText('공용장비 운영 부담은');
+    await expect(page.locator('h1')).toContainText('예약은 Calendar에.');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.getByRole('button', { name: 'Google로 로그인', exact: true })).toBeEnabled();
-    for (const cta of await page.locator('.cta').all()) {
+    for (const cta of await page.getByRole('link', { name: '파일럿 문의하기' }).all()) {
       await expect(cta).toHaveText('파일럿 문의하기↗');
-      await expect(cta).toHaveAttribute('href', /^mailto:dongbeen@gm\.gist\.ac\.kr\?subject=/);
+      await expect(cta).toHaveAttribute('href', '#contact');
     }
     const anchors = await page.locator('a[href^="#"]').evaluateAll(links => links.map(link => link.getAttribute('href')));
     for (const href of anchors) if (href) await expect(page.locator(href)).toHaveCount(1);
@@ -29,9 +29,9 @@ for (const width of [375, 768, 1440]) {
       await expect(page.locator('#main-navigation')).toBeHidden();
       await expect(page).toHaveURL(/#pilot$/);
     }
-    await page.locator('.secondary-button').click();
-    await expect(page).toHaveURL(/#how-it-works$/);
-    await expect(page.locator('#how-title')).toBeInViewport();
+    await page.getByRole('link', { name: '운영 방식 체험하기' }).click();
+    await expect(page).toHaveURL(/#request-assistant$/);
+    await expect(page.locator('#request-assistant')).toBeInViewport();
     const demo = page.locator('#request-assistant .assistant');
     const mutations: string[] = [];
     page.on('request', request => { if (request.method() !== 'GET' && !request.url().includes('googleapis.com')) mutations.push(request.url()); });

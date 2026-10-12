@@ -7,7 +7,7 @@ type RequestType = typeof requestTypes[number];
 type Step = "type" | "equipment" | "details" | "summary" | "done";
 const headings: Record<Step, string> = {
   type: "무엇을 도와드릴까요?", equipment: "어떤 장비의 요청인가요?",
-  details: "필요한 정보를 확인할게요.", summary: "요청 내용을 확인해 주세요.", done: "예시 요청이 접수되었습니다.",
+  details: "필요한 정보를 확인할게요.", summary: "요청 내용을 확인해 주세요.", done: "요청 흐름 체험이 끝났습니다.",
 };
 
 export function RequestAssistant({ summaryPreview = false }: { summaryPreview?: boolean }) {
@@ -54,6 +54,6 @@ export function RequestAssistant({ summaryPreview = false }: { summaryPreview?: 
       </div>
       {step !== "type" && step !== "done" && <button className="assistant-back" type="button" onClick={() => go(step === "equipment" ? "type" : step === "details" ? "equipment" : "details")}>← 이전 단계</button>}
     </div>
-    <p className="assistant-disclaimer" id={noteId}>예시 화면입니다. 실제 Pilot에서는 LabSync 운영자가 요청과 권한을 확인한 뒤 처리합니다.</p>
+    <p className="assistant-disclaimer" id={noteId}>체험 모드 · 실제 요청이 접수되거나 Calendar가 변경되지 않습니다.</p>
   </div>;
 }

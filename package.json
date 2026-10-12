@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:inquiry": "node scripts/test-inquiry-emulator.mjs"
   },
   "dependencies": {
     "firebase": "^13.0.0",
@@ -16,6 +17,9 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "server-only": "^0.0.1"
+  },
+  "overrides": {
+    "@firebase/firestore": { "@grpc/grpc-js": "1.14.6" }
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

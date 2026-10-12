@@ -1,5 +1,71 @@
 # LabSync 10월 14일 준비 보고서
 
+## 2026-10-12 최신 검토본 — 이 절이 아래 10/11 기록보다 우선
+
+Production 공개 승인 **미수신**. 원격 push/배포/운영 DB 생성/분석 활성화/결제는 하지 않았다. 대표자가 검토할 실행 주소는 **http://localhost:3100** (로컬 문의는 가상 정보만 입력).
+
+### 왜 운영 화면이 그대로였는가
+
+- 원격 `main`: `git ls-remote`로 `eb422222e44ace16f256278c2a673c8591eb22e3` 확인.
+- 대표자 Vercel 직접 확인: Production Ready/Current, branch main, SHA `eb42222`, 배포 `9zoWSAQza`, 운영 alias `labsync-pink.vercel.app`. 앞 7자와 전체 SHA가 일치한다.
+- 공개 GitHub Vercel 성공 상태도 동일 SHA 및 배포 URL `https://vercel.com/dongbeen-lees-projects/labsync/9zoWSAQzaA1Qyd6TNpZUmjEo2phL`을 가리킨다. `artifacts/oct12-baseline.json`에 조회 결과 보관.
+- 이전 모든 수정이 미커밋/미푸시 상태였다. 작업 시작 시 보존 checkpoint **03a45d8**을 로컬 main에 만들었고 원격은 변경하지 않았다. 이번 검토본은 이 checkpoint 위의 후속 변경이다.
+
+| 기능 | 로컬 수정본 | GitHub main | Production | 필요한 조치 |
+|---|---|---|---|---|
+| Google 로그인 | 기존 SDK 재사용, 팝업/차단/취소 회귀 통과 | 기존 구현 | 기본 인증창 동작 | 새 버전 배포 후 대표자 실계정 UID·유지·로그아웃 재검증 |
+| 새 레이아웃/제품 흐름 | IMPLEMENTED/TESTED_LOCAL | 미반영 | 이전 화면 | 공개 승인 후 push/build |
+| 문의 도우미 | 3단계 입력/요약/메일 연결 | 미반영 | 준비 안내 CTA | 공개 승인 후 도우미만 배포 가능 |
+| 문의 저장/API | **로컬 Emulator 실제 저장**·17검사 | 없음 | 없음, 강제 비활성 | 운영 DB·보관정책·남용방지 운영 설정 별도 승인 필요 |
+| Kakao | 기존 코드 재사용, 설정 없으면 준비 중 | 없음 | 없음 | 외부 앱/키/서버 credential 후 실계정 검증 |
+| 정책 | 기존 초안 보완, 로컬만 표시 | 없음 | 없음 | 승인 전 Vercel404; 법률 문서 공개는 이번 배포 범위 제외 |
+| SEO/FAQ/OG | 구현·로컬 출력 확인 | 이전 metadata | 이전 metadata | 공개 승인 후 새 metadata 배포; 공유 앱 캐시 실측 별도 |
+| GA4/Clarity | 코드만, 기본 off | 없음 | 수집 안 함 | 이번 배포에서도 off 유지 |
+
+### 눈으로 볼 결과와 실제 증거
+
+- [이전 Desktop](../artifacts/oct12-production-1440.png) / [새 Desktop](../artifacts/oct12-local-after-1440.png)
+- [이전 Mobile](../artifacts/oct12-production-375.png) / [새 Mobile](../artifacts/oct12-local-after-375.png)
+- [새 Tablet](../artifacts/oct12-local-after-768.png), [카카오 준비 상태](../artifacts/oct12-login-menu-375.png)
+- [실제 Emulator 저장 결과](../artifacts/oct12-inquiry-saved.png), [운영용 메일 전달 분기](../artifacts/oct12-inquiry-email.png)
+- 첫 화면을 Calendar 유지→요청 정리→운영자 확인→결과 기록 UI로 재구성. 문제/해결/체험의 중복 설명을 줄이고 파일럿·FAQ·문의 순서로 정리했다. 기존 색상은 실제로 파랑이므로 이름의 pink를 이유로 색을 바꾸지 않았다.
+- 문의 CTA는 `#contact`로 이동. 이메일/10자 이상 문의/Calendar 수만 필수, 이름·소속 선택. 운영에서는 저장하지 않으며 마지막 메일 앱 연결 후 사용자가 직접 발송한다. 로컬에서는 동의 후 Firestore transaction commit이 끝나야 테스트 저장 성공을 표시한다.
+- 웹 문의 데이터는 `demo-labsync-intake` **127.0.0.1 Emulator만** 사용. VERCEL 환경에서는 올바른 emulator 변수까지 주입해도 GET/POST503, status enabled=false를 확인했다. 운영 DB 연결 코드를 숨겨 켜는 flag는 없다.
+- 실제 연구실 운영 요청/membership/운영자 대시보드는 만들지 않았다. 체험 모드가 실제 접수로 보이던 완료 제목을 수정했다.
+
+### 검사 결과와 남은 위험
+
+- build/lint/typecheck 통과. Google 공개 설정/허용 도메인·popup 재시도/차단·UI375/768/1440·SEO·Kakao 순수 경계: **13 passed**. 문의 입력 실패/중복 클릭/메일 분기: **2 passed**. 최종 정책 변경 후 inquiry/readiness **3 passed** 재확인.
+- Firestore/Auth Emulator **17개 검사**: 실제 문서 저장·동시재시도1건·키 충돌·이메일3회/시간 제한·분당 전체20회 제한·동의/입력/Origin/challenge/honeypot·익명/일반/운영자 API·클라이언트 직접 읽기/쓰기/role/타 lab 경로 거부·브라우저 저장 후 성공. `artifacts/oct12-inquiry-results.json`.
+- Emulator의 auth는 운영 서명 검증을 대신하지 않는다. 다른 lab 경로 거부는 deny-all 규칙 검사이며 실제 Lab A/B membership 격리가 완성됐다는 뜻이 아니다. 운영 inquiries 생성은 미승인이다.
+- 강제 Vercel fixture에서 정책 /privacy, /terms **404**, inquiry API **503**. 로컬 검토 모드에서만 초안 제공. `artifacts/oct12-release-evidence.json`.
+- 이전 skip5개: (1) Firebase 공개 설정 (2) Google popup cancel/reopen (3) blocked popup은 이번 실제 네트워크 검사로 해소. (4) Kakao route fixture는 지난 격리검사 통과/실제 제공업체 미설정, (5) analytics fixture는 지난 mock검사 통과/실제 수집 의도적으로 비활성. mock을 실계정/실측으로 계산하지 않음.
+- Google 실계정 성공·UID·세션·로그아웃은 이전 대표자 확인 이후 이번 턴에는 미실행. 비밀번호를 에이전트가 입력하지 않음. 새 배포 후 대표자가 검증해야 한다.
+- npm audit: **high9 → high5**, `--omit=dev` **0**. 운영 패키지 수정은 아래 advisory 평가 참조. 남은5건을 해결 완료로 표시하지 않는다.
+
+| Advisory / 영향 패키지 | 실제 경로·조치 | 잔여 위험 |
+|---|---|---|
+| GHSA-m9gg-hp2v-232j (high), GHSA-f596-whhp-79r4 (low) | firebase→firestore→grpc-js1.9.16. 서버 인증서 판정/오류노출 취약점. @firebase/firestore 하위 grpc-js를 패치된1.14.6으로 한정 override, lock 갱신. Admin 경로는 이미1.14.6 | 앱은 해당 gRPC 서버/인증서 코드를 실행하지 않았으나 운영 dependency 경고를 제거. 다운그레이드/force 없음 |
+| GHSA-vfj7-8cjw-p6xm (high) | eslint-config-next→@next/eslint-plugin-next→fast-glob→micromatch→braces3.0.3, 개발 전용5항목. 안전한 upstream patched 버전 아직 없음 | 깊은 brace pattern으로 개발 도구 DoS 가능. 실제 Next getRootDirs는 settings.next.rootDir glob이 있을 때 호출되며 현재 설정에 없음. 사용자 HTTP 입력 경로 없음. 신뢰하지 않는 lint 설정 실행 금지, upstream 패치 후 갱신 |
+
+근거: [gRPC 인증서 advisory](https://github.com/grpc/grpc-node/security/advisories/GHSA-m9gg-hp2v-232j), [gRPC 오류 advisory](https://github.com/grpc/grpc-node/security/advisories/GHSA-f596-whhp-79r4), [braces advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). 원본 audit는 artifacts/audit-oct12-before.json, after.json, production.json. 격리 도구 artifacts/emulator-tools의 의존성은 배포 package가 아니다.
+
+### 배포 승인 범위와 롤백
+
+승인 요청 대상: 새 홈페이지/CTA·입력 도우미/명확한 예시 체험/기존 Google 로그인/SEO·공유 자산/의존성 패치. 카카오 준비 중, 분석 off, 문의 서버 저장 off, 정책 초안 비공개, 결제 없음. 새 DB rules 파일은 **자동 배포하지 않는다**.
+
+주요 코드 변경: app/page.tsx·release.css·layout.tsx, OperationsPreview/PilotInquiry/ContactCTA/RequestAssistant/SiteFooter, app/api/inquiries/*·lib/inquiry*·firestore.rules/firebase.json(로컬 전용), lib/legal-preview·privacy/terms, package/lock. 이전 checkpoint의 Kakao/SEO/분석 코드를 함께 포함한다. 전체 변경 파일은 승인 직전 `git diff --name-status eb42222 HEAD`로 확인한다.
+
+승인 후만 main push → Vercel 자동 Production build → 배포 SHA/Ready/Current와 alias 확인 → 3해상도·CTA·Google popup/대표자 실계정·정책404·문의503·수집0 검증. Vercel 관리자 접근이 없으면 대표자가 Deployments의 새 commit 배포 상태를 확인한다. 공개 환경변수는 기존 Google4개 유지; SITE_URL과 CONTACT_EMAIL은 사이트 설정이며 Google 인증 필수4개와 구분한다. `LEGAL_DRAFT_PREVIEW`/Emulator 변수를 Vercel에 등록하지 않는다.
+
+문제 발생 시 Vercel labsync → Deployments → 기존 **9zoWSAQza / eb42222** → 배포 메뉴 **Rollback/Instant Rollback**(UI에 제공되는 항목)로 복구하고 Current·운영 alias·로그인·CTA를 다시 확인한다. 롤백 권한/메뉴가 없으면 기존 SHA를 새 로컬 복구 브랜치에 checkout하여 검증·승인 후 재배포한다. `reset --hard`나 force push로 기록을 삭제하지 않는다. 이번엔 운영 데이터 migration이 없어 DB 롤백이 필요 없다. 이전 버전의 문의 CTA 준비안내 문제는 롤백 시 되돌아온다.
+
+대표자의 다음 단계는 **화면 검토와 배포 승인**이다. 도메인/키/토스 작업을 한 번에 요구하지 않는다. 아직 승인하지 않았다는 10/12 지시를 유지한다.
+
+---
+
+## 아래는 2026-10-11 이력 (현 상태는 위 최신 절 참고)
+
 기준일 2026-10-11. 기존 Next.js 16.3.8 App Router / Firebase Auth / Vercel 프로젝트를 개선했다. 새 코드의 Production 배포는 **하지 않았다**. 실제 로컬 preview: http://localhost:3100.
 
 요구사항의 출처는 사용자 요청서다. 강의 6주차 PDF/PPT가 없으므로 강의 원문의 확정/검토/다음주/복습은 BLOCKED(원문 미확인). [요구사항 매트릭스](requirements-oct14.md)의 R01–R12와 아래 항목을 대조한다.

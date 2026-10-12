@@ -4,6 +4,7 @@ import "./globals.css";
 import "./assistant.css";
 import "./refinements.css";
 import "./readiness.css";
+import "./release.css";
 import { canonicalOrigin } from '@/lib/seo';
 import { AnalyticsConsent } from '@/components/AnalyticsConsent';
 export const metadata: Metadata = {

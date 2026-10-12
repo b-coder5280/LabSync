@@ -65,4 +65,3 @@ Firebase 초기화·Google 제공업체·허용 도메인 설정은 확인되었
 # 2026-10-11 추가 작업
 
 최신 통합 결과는 [10/14 준비 보고서](oct14-readiness.md)를 참고한다. 기존 Google 흐름 유지, 선택적 카카오 서버 인증 코드, 기본 비활성 분석 동의, SEO·정책 초안·디자인·이메일 fallback을 추가했다. build/lint/typecheck 통과, 기본 Playwright 10 passed/5 skipped, 별도 Kakao route 및 analytics fixture 각각 1 passed. 마지막 태블릿 줄바꿈 수정 후 768px 회귀도 1 passed. 새 코드 Production 배포는 하지 않았다. 아래 기존 기록과 최신 운영 popup 검증 결과를 구분한다.
-

@@ -1,5 +1,9 @@
 # 이번 작업의 오류와 제한
 
+2026-10-12 갱신: gRPC를1.14.6으로 패치하여 audit high9→5, production0. 남은5는 patched version 없는 개발용 braces 경로. 정확한 advisory·도달 경로·위험은 oct14-readiness 최신 절에 기록했다. 강의 원문은 수신했고 현재 Vercel 배포 eb42222는 대표자 확인으로 확정됐다. 로컬 DB는 승인된 Emulator 문의만 새로 구현했으며 운영 DB는 여전히 없다. 이전 항목은 발생 당시 이력이다.
+
+브라우저 문의 자동화가 실제 사용자보다 빨라 최소1.5초 anti-bot 조건에 걸려 첫 실행이 실패했다. 서버 저장 성공으로 오인하지 않았고, 명시된 최소 간격을 테스트에 반영한 재실행에서 실제 commit과 화면 성공을 확인했다. UI 실패 테스트도 별도로503 응답/입력 유지/중복 클릭 차단을 검증했다.
+
 - 운영 사이트 문의 CTA가 `#contact-status`로 연결됨을 브라우저에서 발견. 대표자가 이미 승인한 이메일을 코드 fallback으로 추가. 환경변수 미등록에도 실제 mailto로 연결하며 접수완료로 표시하지 않는다. 새 배포 전 운영 문제는 남아 있다.
 - 초기 CONFIGURATION_NOT_FOUND는 이전 작업에서 Firebase Auth 초기화 이후 해결. 이번 운영 Google popup은 열림. 과거 “No Environment Variables” 화면만으로 현재 배포 상태를 추정하지 않는다.
 - Next.js 16.3.8 dev가 AGENTS.md/CLAUDE.md를 자동 생성. 로컬 패키지의 Route Handler 문서를 읽고 기존 버전 기억에만 의존하지 않았다.

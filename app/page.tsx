@@ -1,57 +1,27 @@
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
+import { ContactCTA } from '@/components/ContactCTA';
+import { RequestAssistant } from '@/components/RequestAssistant';
+import { PilotInquiry } from '@/components/PilotInquiry';
+import { OperationsPreview } from '@/components/OperationsPreview';
 import { faqs } from '@/lib/public-content';
 import { canonicalOrigin, structuredData } from '@/lib/seo';
-import { ContactCTA } from "@/components/ContactCTA";
-import { RequestAssistant } from "@/components/RequestAssistant";
-import { siteConfig as s } from "@/lib/site-config";
+import { siteConfig as s } from '@/lib/site-config';
 
-const steps = [
-  ["요청", "Request Assistant에서 필요한 운영 요청을 보냅니다."],
-  ["확인", "LabSync가 요청자, 대상 Calendar, 현재 상태를 확인합니다."],
-  ["처리", "확인된 요청에 필요한 Calendar 작업을 수행합니다."],
-  ["검증", "작업 후 실제 Calendar를 다시 읽고 요청한 결과와 같은지 확인합니다."],
-];
-const usageSteps = [
-  ["요청", "예약 변경, 취소, 권한, 운영 오류 중 필요한 항목을 선택합니다."],
-  ["필요한 정보 확인", "장비, 예약, 시간 등 처리에 필요한 정보만 단계적으로 확인합니다."],
-  ["요청 요약", "실행 전에 무엇을 바꾸려는지 사용자가 한 번 더 확인합니다."],
-  ["LabSync 처리", "운영자가 권한과 현재 상태를 확인한 뒤 필요한 Calendar 작업을 처리합니다."],
-  ["결과 확인", "작업 후 실제 Calendar 상태를 다시 확인하고 요청자에게 결과를 알려줍니다."],
-];
 export default function Home() {
-  return <>
-    <a className="skip-link" href="#main">본문으로 바로가기</a>
-    <SiteHeader />
-    <main id="main">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData({ '@context': 'https://schema.org', '@graph': [
-        { '@type': 'Organization', '@id': canonicalOrigin() + '/#organization', name: 'LabSync', url: canonicalOrigin(), email: 'dongbeen@gm.gist.ac.kr', founder: { '@type': 'Person', name: '이동빈' } },
-        { '@type': 'Service', name: '공용장비 Google Calendar 운영 지원', serviceType: '연구실 공용장비 운영 지원', provider: { '@id': canonicalOrigin() + '/#organization' }, description: s.description },
-        { '@type': 'FAQPage', mainEntity: faqs.map(([question, answer]) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })) },
-      ] }) }} />
-      <section className="hero" aria-labelledby="hero-title"><div className="container hero-layout">
-        <div className="hero-copy"><p className="eyebrow">Shared Equipment Operations</p><p className="hero-buyer">PI·연구실 책임자를 위한 공용장비 운영 지원</p><h1 id="hero-title"><span>예약 방식은 그대로,</span><span>공용장비 운영 부담은<br /><em>LabSync로.</em></span></h1><div className="hero-description"><p>기존 Google Calendar를 유지하면서 예약 변경·취소, 접근 권한, 운영 오류 대응을 지원합니다. 반복되는 운영을 맡기고 연구에 집중하세요.</p></div><div className="hero-action"><div className="hero-buttons"><ContactCTA /><a className="secondary-button" href="#how-it-works">운영 방식 보기 <span aria-hidden="true">↓</span></a></div><p className="offer-note">₩300,000 <span>·</span> 최대 5개 Calendar <span>·</span> 운영 시작 후 6주</p><p className="buyer-note">온보딩 포함 · 자동 갱신 없음</p></div></div>
-        <figure className="operations-visual" aria-label="기존 Google Calendar에 LabSync 운영 지원을 더하는 방식"><div className="visual-heading"><span>YOUR LAB, IN SYNC</span><span className="visual-tag">운영 구조</span></div><div className="calendar-block"><div className="calendar-symbol" aria-hidden="true">31</div><div><p>예약은 익숙한 곳에서</p><h2>기존 Google Calendar</h2></div></div><div className="connection-line" aria-hidden="true"><span>+</span></div><div className="operations-block"><div className="operations-title"><span className="ls-symbol" aria-hidden="true">LS</span><div><p>반복되는 운영은 함께</p><h2>LabSync 운영 지원</h2></div></div><ul><li><span>01</span>예약 변경·취소<span aria-hidden="true">↗</span></li><li><span>02</span>접근 권한 관리<span aria-hidden="true">↗</span></li><li><span>03</span>운영 오류 대응<span aria-hidden="true">↗</span></li></ul><p className="visual-process">요청 확인 <span>→</span> 운영자 처리 <span>→</span> 결과 검증</p></div><figcaption>예약 도구를 바꾸지 않고, 운영 부담을 나눕니다.</figcaption></figure>
-      </div></section>
-
-      <section id="request-assistant" className="section usage-section" aria-labelledby="usage-title"><div className="container">
-        <div className="section-intro"><h2 id="usage-title">요청은 채팅처럼.<br />처리는 운영 절차대로.</h2><p>복잡한 관리 화면을 배울 필요 없이,<br />필요한 요청을 선택하고 질문에 답하세요.<br />확인·처리·검증은 LabSync가 맡습니다.</p></div>
-        <div className="usage-layout"><RequestAssistant /><ol className="usage-steps">{usageSteps.map(([title, text], i) => <li key={title}><span>0{i + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol></div>
-        <p className="human-review-note">자연어 요청이 곧바로 Calendar 변경으로 이어지지 않습니다.<br className="mobile-break" /> 실제 Pilot에서는 LabSync 운영자가 요청을 확인한 뒤 처리합니다.</p>
-      </div></section>
-
-      <section id="problem" className="section problem-section compact-problem" aria-labelledby="problem-title"><div className="container"><h2 id="problem-title">문제는 예약이 아니라,<br />예약 뒤의 운영입니다.</h2><ul className="problem-topics"><li>예약 변경·취소</li><li>구성원 권한</li><li>운영 오류</li></ul><p>결국 누군가는 연구 대신 시스템 운영까지 맡게 됩니다.</p></div></section>
-
-      <section id="how-it-works" className="section how-section" aria-labelledby="how-title"><div className="container"><h2 id="how-title">LabSync 운영 방식</h2><ol className="timeline">{steps.map(([title, text], i) => <li key={title}><span className="timeline-point">0{i + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol></div></section>
-
-      <section id="pilot" className="section pilot-section" aria-labelledby="pilot-title"><div className="container"><div className="pilot-offer">
-        <div className="pilot-summary"><h2 id="pilot-title">6주 Paid Pilot</h2><p className="price">{s.pilotPrice}</p><p className="pilot-description">실제 운영 요청이 얼마나 발생하고,<br />그 부담을 얼마나 대신할 수 있는지<br />6주 동안 확인합니다.</p><ContactCTA /></div>
-        <div className="pilot-details"><h3>포함되는 내용</h3><ul className="included-list">{["초기 설정 및 온보딩", `최대 ${s.pilotCalendarLimit}개 공용장비 Google Calendar`, `운영 시작 후 ${s.pilotObservationPeriod} 운영 관찰`, s.serviceHours, s.ackTarget, "자동 갱신 없음"].map(text => <li key={text}><span aria-hidden="true">✓</span>{text}</li>)}</ul><p className="pilot-note">4시간은 해결 시간이 아닌 접수 확인 목표입니다.<br />처리 시간은 요청 내용과 확인 과정에 따라 달라지며, 보장하지 않습니다.</p></div>
-      </div><div className="scope-note"><h3>서비스 범위</h3><p>공용장비 Google Calendar 운영에 집중합니다.<br />연구실 전체 IT 관리, 장비 유지보수, 연구 데이터 관리는 제공하지 않습니다.</p></div></div></section>
-
-      <section id="contact" className="final-cta" aria-labelledby="contact-title"><div className="container final-layout"><div><p className="final-label">Keep the Calendar.<br />Offload the operations.</p><h2 id="contact-title">공용장비 운영,<br />계속 한 사람이 맡고 있나요?</h2></div><div className="final-action"><p>기존 Google Calendar를 그대로 유지하면서<br />반복되는 운영 요청을 LabSync로 분리할 수 있는지<br />6주 Pilot으로 확인해 보세요.</p><ContactCTA />{!s.contactHref && <p id="contact-status" className="contact-status">파일럿 문의 채널을 준비 중입니다. 현재 이 홈페이지에서는 문의를 접수하지 않습니다.</p>}</div></div></section>
-      <section id="faq" className="section faq-section"><div className="container faq-grid"><div><p className="eyebrow">BEFORE YOUR PILOT</p><h2>도입 전에<br />궁금한 점</h2></div><div>{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></div></section>
-    </main>
-    <SiteFooter />
-  </>;
+  return <><a className="skip-link" href="#main">본문으로 바로가기</a><SiteHeader /><main id="main">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData({ '@context': 'https://schema.org', '@graph': [
+      { '@type': 'Organization', '@id': canonicalOrigin() + '/#organization', name: 'LabSync', url: canonicalOrigin(), email: 'dongbeen@gm.gist.ac.kr', founder: { '@type': 'Person', name: '이동빈' } },
+      { '@type': 'Service', name: '공용장비 Google Calendar 운영 지원', provider: { '@id': canonicalOrigin() + '/#organization' }, description: s.description },
+      { '@type': 'FAQPage', mainEntity: faqs.map(([question, answer]) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })) },
+    ] }) }} />
+    <section className="hero release-hero" aria-labelledby="hero-title"><div className="container hero-layout">
+      <div className="hero-copy"><p className="eyebrow"><span className="pilot-dot" /> 6주 유료 파일럿 · 도입 상담</p><p className="hero-buyer">PI·연구실 책임자를 위한 공용장비 운영 지원</p><h1 id="hero-title">예약은 Calendar에.<br /><em>운영 요청은<br />LabSync에.</em></h1><p className="release-description">예약 도구를 바꾸지 않아도 됩니다.<br />변경·취소·권한 요청을 정리하고,<br className="mobile-break" /> 운영자가 확인해 처리합니다.</p><div className="hero-buttons"><ContactCTA /><a className="secondary-button" href="#request-assistant">운영 방식 체험하기 <span aria-hidden="true">↓</span></a></div><p className="offer-note">₩300,000 <span>·</span> Calendar 최대 5개 <span>·</span> 온보딩 포함</p><p className="buyer-note">운영 시작 후 6주 · 자동 갱신 없음</p></div><OperationsPreview />
+    </div><div className="container service-boundary"><span>KEEP YOUR CALENDAR</span><p>예약 시스템 교체 없이 <b>요청 정리 → 운영자 확인 → 처리 결과 기록</b></p></div></section>
+    <section id="problem" className="section release-problem"><div className="container problem-layout"><div><p className="eyebrow">AFTER THE BOOKING</p><h2>예약보다 번거로운 건,<br />예약 이후의 일.</h2></div><div className="problem-list">{[['흩어지는 요청','메일, 메신저, 구두 요청을 담당자가 다시 모읍니다.'],['반복되는 권한 확인','누가 어떤 장비를 쓸 수 있는지 매번 확인합니다.'],['남지 않는 처리 결과','무엇이 바뀌었는지 다시 묻고, 다시 확인합니다.']].map(([t,d],i)=><div key={t}><span>0{i+1}</span><div><h3>{t}</h3><p>{d}</p></div></div>)}</div></div></section>
+    <section id="how-it-works" className="section release-demo" aria-labelledby="how-title"><div className="container"><div className="demo-heading"><div><p className="eyebrow">ONE REQUEST, A CLEAR NEXT STEP</p><h2 id="how-title">요청은 간단하게.<br />처리는 확인을 거쳐서.</h2></div><p>필요한 정보를 순서대로 묻고 정리합니다.<br />실제 파일럿에서는 운영자가 권한과 예약을 확인합니다.</p></div><div className="demo-layout" id="request-assistant"><div className="demo-explainer"><span className="mode-label">방문자용 체험</span><h3>한 번 요청해 보세요.</h3><p>가상의 장비와 예약으로<br />요청이 정리되는 과정을 살펴보세요.</p><ol>{[['요청 선택','변경, 취소, 접근 권한, 운영 오류'],['필요한 정보 확인','장비·예약·요청 내용을 한 번에'],['요약과 결과 예시','운영자가 확인할 내용을 명확하게']].map(([t,d],i)=><li key={t}><b>0{i+1}</b><div><strong>{t}</strong><p>{d}</p></div></li>)}</ol><div className="pilot-mode-note"><strong>실제 운영 요청은?</strong><p>승인된 파일럿 연구실에 별도로 제공합니다. 현재 홈페이지 체험은 요청 접수·Calendar 변경을 하지 않습니다.</p></div></div><RequestAssistant /></div></div></section>
+    <section id="pilot" className="section release-pilot"><div className="container"><div className="pilot-offer"><div className="pilot-summary"><p className="eyebrow">START SMALL, LEARN TOGETHER</p><h2 id="pilot-title">우리 연구실에 맞는지,<br />6주 동안 확인하세요.</h2><p className="pilot-description">첫 Paid Pilot으로 실제 운영 수요와<br />지원 범위를 함께 검증합니다.</p><ContactCTA /></div><div className="pilot-details"><div className="pilot-price-row"><span>6주 Paid Pilot</span><strong>{s.pilotPrice}</strong></div><ul className="included-list">{['최대 5개 공용장비 Google Calendar','초기 설정 및 온보딩 포함','운영 시작 후 6주',s.serviceHours,s.ackTarget,'자동 갱신 없음'].map(t=><li key={t}><span aria-hidden="true">✓</span>{t}</li>)}</ul><p className="pilot-note">4시간은 해결 시간이 아닌 접수 확인 목표입니다.<br />연구실 전체 IT 관리·장비 유지보수는 포함하지 않습니다.</p></div></div></div></section>
+    <section id="faq" className="section faq-section"><div className="container faq-grid"><div><p className="eyebrow">BEFORE YOUR PILOT</p><h2>도입 전에<br />궁금한 점</h2></div><div>{faqs.map(([q,a])=><details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div></div></section>
+    <section id="contact" className="section release-contact"><div className="container intake-layout"><div><p className="eyebrow">LET’S TALK ABOUT YOUR LAB</p><h2>운영의 어떤 부분이<br />가장 번거로운가요?</h2><p>연구실 상황을 알려주시면<br />파일럿 지원 범위를 함께 확인하겠습니다.</p><div className="contact-person"><span className="owner-avatar">L</span><div><strong>이동빈 · LabSync</strong><a href="mailto:dongbeen@gm.gist.ac.kr">dongbeen@gm.gist.ac.kr</a></div></div><p className="contact-note">상담으로 바로 결제되거나<br />파일럿 계약이 체결되지 않습니다.</p></div><PilotInquiry /></div></section>
+  </main><SiteFooter /></>;
 }
