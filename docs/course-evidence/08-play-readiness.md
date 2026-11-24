@@ -3,7 +3,8 @@
 | 항목 | 상태 |
 | --- | --- |
 | 웹 앱 manifest·아이콘 | PASS · 로컬 HTTP 200 |
-| Play 개발자 종류와 본인·주소·기기 인증 | BLOCKED · 대표자 계정과 실제 기기 필요. 조직 등록은 해당하는 서류·D-U-N-S 요구 확인. |
+| 개발자 계정 등록비 | 개인 계정 등록 화면에서 일회성 USD 25 결제 완료를 사용자가 보고했습니다. |
+| Play 개발자 본인·주소·기기 인증 | Play Console 홈에서 남은 인증 항목 확인 대기. 안드로이드 기기 인증이 요구되면 계정 소유자가 진행합니다. |
 | 계정 및 데이터 삭제 | PASS · 웹 URL, 로그인 후 삭제 신청, 운영자 조회 검증. 실제 삭제 절차·기한 승인 대기. |
 | Android | TWA와 Digital Asset Links 경로를 우선 검토. 운영 도메인, 기존 패키지 ID 소유권, Play 서명, 공식 target SDK 표를 확인한 뒤 AAB 생성. Google OAuth는 시스템 브라우저 방식 사용. 앱 패키지와 기기 시험은 NOT TESTED. |
 | 비공개 테스트 | BLOCKED · Play Console 출시 준비, 실제 AAB와 링크, 동의한 Android 테스터 필요. |
