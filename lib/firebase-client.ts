@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
+import { browserLocalPersistence, connectAuthEmulator, getAuth, setPersistence } from "firebase/auth";
 
 const config = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,7 +10,14 @@ const config = {
 export const firebaseConfigured = Object.values(config).every(Boolean);
 export function getClientAuth() {
   if (!firebaseConfigured) throw new Error("auth/configuration-missing");
-  return getAuth(getApps().length ? getApp() : initializeApp(config));
+  const auth = getAuth(getApps().length ? getApp() : initializeApp(config));
+  const emulator = process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_URL;
+  if (emulator === 'http://127.0.0.1:9095' && config.projectId === 'demo-labsync-intake' &&
+      typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname) &&
+      !auth.emulatorConfig) {
+    connectAuthEmulator(auth, emulator, { disableWarnings: true });
+  }
+  return auth;
 }
 export async function prepareAuth() {
   const auth = getClientAuth();

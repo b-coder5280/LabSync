@@ -17,7 +17,7 @@ export function safeReturnPath(value: string | null | undefined): string {
   if (!value || !value.startsWith('/') || value.startsWith('//') || /[\\\r\n]/.test(value)) return '/';
   try {
     const url = new URL(value, 'https://return.invalid');
-    if (url.origin !== 'https://return.invalid' || !['/', '/privacy', '/terms'].includes(url.pathname)) return '/';
+    if (url.origin !== 'https://return.invalid' || !['/', '/privacy', '/terms', '/dashboard', '/account-deletion'].includes(url.pathname)) return '/';
     return url.pathname + url.search + url.hash;
   } catch { return '/'; }
 }

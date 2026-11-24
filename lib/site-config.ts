@@ -11,7 +11,7 @@ export const siteConfig = {
   title: "LabSync | 연구실 공용장비 Google Calendar 운영",
   headline: "장비 예약은 그대로, 운영은 더 간단하게.",
   headlineLead: "공용장비 예약은 그대로.",
-  description: "기존 Google Calendar를 유지하면서 예약 변경, 접근 권한, 운영 오류 대응에 드는 연구실의 수작업을 줄입니다.",
+  description: "대학·연구기관 연구실의 예약 변경·취소, 권한과 운영 오류 요청을 한곳에서 관리합니다. 기존 Google Calendar 유지, 무료 데모와 6주 파일럿 안내.",
   pilotPrice: "₩300,000", pilotCalendarLimit: 5, pilotObservationPeriod: "6주",
   serviceHours: "월–금 09:00–18:00 KST", ackTarget: "영업시간 기준 4시간 이내 접수 확인 목표",
   cta: "파일럿 문의하기", contactUrl, contactEmail,

@@ -6,3 +6,11 @@ export function canonicalOrigin() {
   } catch { return 'https://labsync-pink.vercel.app'; }
 }
 export function structuredData(value: unknown) { return JSON.stringify(value).replace(/</g, '\\u003c'); }
+
+export function publicPageMetadata(path: string, title: string, description: string) {
+  return {
+    title, description, alternates: { canonical: path },
+    openGraph: { title, description, url: path, locale: 'ko_KR', images: [{ url: '/opengraph-image.png', alt: 'LabSync 연구실 운영 요청 관리' }] },
+    twitter: { card: 'summary_large_image' as const, title, description, images: ['/opengraph-image.png'] },
+  };
+}

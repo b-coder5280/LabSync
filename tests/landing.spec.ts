@@ -9,7 +9,7 @@ for (const width of [375, 768, 1440]) {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
-    await expect(page.locator('h1')).toContainText('예약은 Calendar에.');
+    await expect(page.locator('h1')).toContainText('기존 Google Calendar는 그대로,');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.getByRole('button', { name: 'Google로 로그인', exact: true })).toBeEnabled();
@@ -29,7 +29,7 @@ for (const width of [375, 768, 1440]) {
       await expect(page.locator('#main-navigation')).toBeHidden();
       await expect(page).toHaveURL(/#pilot$/);
     }
-    await page.getByRole('link', { name: '운영 방식 체험하기' }).click();
+    await page.getByRole('link', { name: '무료 데모 체험' }).click();
     await expect(page).toHaveURL(/#request-assistant$/);
     await expect(page.locator('#request-assistant')).toBeInViewport();
     const demo = page.locator('#request-assistant .assistant');

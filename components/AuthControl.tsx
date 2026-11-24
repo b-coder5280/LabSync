@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { GoogleAuthProvider, onIdTokenChanged, signInWithPopup, signOut, type User, type Auth } from "firebase/auth";
 import { firebaseConfigured, prepareAuth } from "@/lib/firebase-client";
@@ -17,6 +18,7 @@ export function AuthControl() {
   const [message, setMessage] = useState("");
   const [open, setOpen] = useState(false);
   const [kakaoEnabled, setKakaoEnabled] = useState(false);
+  const [lineEnabled, setLineEnabled] = useState(false);
   const auth = useRef<Auth | null>(null);
   const locked = useRef(false);
   const root = useRef<HTMLDivElement>(null);
@@ -25,6 +27,7 @@ export function AuthControl() {
   useEffect(() => {
     const controller = new AbortController();
     fetch('/api/auth/kakao/status', { signal: controller.signal }).then(response => response.json()).then(result => setKakaoEnabled(result.enabled === true)).catch(() => {});
+    fetch('/api/auth/line/status', { signal: controller.signal }).then(response => response.json()).then(result => setLineEnabled(result.enabled === true)).catch(() => {});
     return () => controller.abort();
   }, []);
 
@@ -93,8 +96,12 @@ export function AuthControl() {
   return <div className="auth-control" ref={root} data-clarity-mask="true">
     {user ? <>
       <button ref={trigger} type="button" className="auth-button" aria-expanded={open} aria-controls="account-panel" onClick={() => setOpen(!open)}><span className="avatar" aria-hidden="true">{(user.displayName || "사용자").slice(0, 1)}</span><span className="account-name">{user.displayName || "내 계정"}</span><span aria-hidden="true">⌄</span></button>
-      {open && <div id="account-panel" className="account-panel"><strong>{user.displayName || "Google 계정"}</strong><p className="account-email">{user.email}</p><div className="access-notice"><strong>이용 권한 확인 전</strong><p>로그인이 완료되었습니다. 연구실 이용 권한은 별도로 확인하며, 현재 연결된 연구실 데이터는 없습니다.</p></div><button className="auth-button" type="button" disabled={busy} onClick={logout}>{busy ? "로그아웃 중…" : "로그아웃"}</button></div>}
-    </> : <div className="signin-options"><button ref={trigger} type="button" className="auth-button" disabled={busy || (firebaseConfigured && !ready)} onClick={login}><GoogleIcon /><span>{busy ? "로그인 중…" : firebaseConfigured && !ready ? "계정 확인 중…" : "Google로 로그인"}</span></button><button className="signin-more" type="button" aria-label="다른 로그인 방법" aria-expanded={open} aria-controls="signin-panel" onClick={() => setOpen(!open)}>⌄</button>{open && <div className="account-panel" id="signin-panel"><strong>로그인 방법</strong>{kakaoEnabled ? <a className="kakao-button" href="/api/auth/kakao/start" onClick={event => { event.preventDefault(); track('login_start', 'kakao'); const target = new URL('/api/auth/kakao/start', location.origin); target.searchParams.set('returnTo', location.pathname + location.search + location.hash); location.assign(target.href); }}>카카오로 로그인</a> : <p className="access-notice">카카오 로그인 준비 중<br /><small>현재 Google 로그인을 이용해 주세요.</small></p>}<p className="account-email">로그인은 파일럿 신청이나 연구실 접근 권한을 자동으로 부여하지 않습니다.</p></div>}</div>}
+      {open && <div id="account-panel" className="account-panel"><strong>{user.displayName || "Google 계정"}</strong><p className="account-email">{user.email}</p><div className="access-notice"><Link href="/dashboard" onClick={() => setOpen(false)}>연구실 요청 관리</Link><p>초대를 받은 연구실의 요청을 확인할 수 있습니다.</p></div><button className="auth-button" type="button" disabled={busy} onClick={logout}>{busy ? "로그아웃 중…" : "로그아웃"}</button></div>}
+    </> : <div className="signin-options"><button ref={trigger} type="button" className="auth-button" disabled={busy || (firebaseConfigured && !ready)} onClick={login}><GoogleIcon /><span>{busy ? "로그인 중…" : firebaseConfigured && !ready ? "계정 확인 중…" : "Google로 로그인"}</span></button><button className="signin-more" type="button" aria-label="다른 로그인 방법" aria-expanded={open} aria-controls="signin-panel" onClick={() => setOpen(!open)}>⌄</button>{open && <div className="account-panel" id="signin-panel"><strong>로그인 방법</strong>{kakaoEnabled ? <a className="kakao-button" href="/api/auth/kakao/start" onClick={event => { event.preventDefault(); track('login_start', 'kakao'); const target = new URL('/api/auth/kakao/start', location.origin); target.searchParams.set('returnTo', location.pathname + location.search + location.hash); location.assign(target.href); }}>카카오로 로그인</a> : <p className="access-notice">카카오 로그인 준비 중<br /><small>현재 Google 로그인을 이용해 주세요.</small></p>}{lineEnabled ? <button className="auth-button" type="button" onClick={() => {
+      const target = new URL('/api/auth/line/start', location.origin);
+      target.searchParams.set('returnTo', location.pathname + location.search + location.hash);
+      location.assign(target.href);
+    }}>LINE으로 로그인</button> : <p className="access-notice">LINE 로그인 준비 중</p>}<p className="account-email">로그인은 파일럿 신청이나 연구실 접근 권한을 자동으로 부여하지 않습니다.</p></div>}</div>}
     {message && <div className="auth-message" role="status"><p>{message}</p><button type="button" aria-label="로그인 알림 닫기" onClick={() => setMessage("")}>닫기</button></div>}
   </div>;
 }

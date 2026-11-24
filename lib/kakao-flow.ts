@@ -25,16 +25,21 @@ type AuthAdapter = {
 };
 export async function firebaseTokenForKakao(uid: string, auth: AuthAdapter) {
   if (!/^kakao:[1-9]\d*$/.test(uid)) throw new Error('kakao/invalid-identity');
+  return firebaseTokenForProvider(uid, '카카오 사용자', 'kakao', auth);
+}
+
+export async function firebaseTokenForProvider(uid: string, displayName: string, provider: 'kakao' | 'line', auth: AuthAdapter) {
+  if (!uid.startsWith(provider + ':')) throw new Error(provider + '/invalid-identity');
   try {
     const user = await auth.getUser(uid);
-    if (user.disabled) throw new Error('kakao/user-disabled');
+    if (user.disabled) throw new Error(provider + '/user-disabled');
   } catch (error) {
     if (!(error && typeof error === 'object' && 'code' in error && error.code === 'auth/user-not-found')) throw error;
-    try { await auth.createUser({ uid, displayName: '카카오 사용자' }); }
+    try { await auth.createUser({ uid, displayName }); }
     catch (createError) {
       // Concurrent first logins may race. Re-read; never adopt a different UID.
       if (!(createError && typeof createError === 'object' && 'code' in createError && createError.code === 'auth/uid-already-exists')) throw createError;
-      if ((await auth.getUser(uid)).disabled) throw new Error('kakao/user-disabled');
+      if ((await auth.getUser(uid)).disabled) throw new Error(provider + '/user-disabled');
     }
   }
   // No roles or membership claims, no email lookup or automatic linking.
