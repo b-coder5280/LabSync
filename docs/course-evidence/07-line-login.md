@@ -6,4 +6,6 @@
 
 [LINE 공식 웹 로그인](https://developers.line.biz/en/docs/line-login/integrate-line-login/) · [PKCE](https://developers.line.biz/en/docs/line-login/integrate-pkce/)
 
+2026-11-24 KST: 사용자가 `LabSync` Provider를 생성했습니다. 신규 LINE Login 채널의 서비스 제공 지역 목록은 일본·태국·대만·인도네시아이며 한국이 없습니다. 한국 대상 LabSync의 채널 생성과 실제 계정 로그인 시험은 이 단계에서 보류했습니다. 과제의 막힌 지점으로 기록합니다. [공식 지역 목록](https://developers.line.biz/en/docs/line-login/getting-started/)
+
 [다음 실습 → 2-6 구글 플레이 사전 준비](https://claude.ai/artifact/1GBHSTTKx9mqACctvchKrc#b2-6)
