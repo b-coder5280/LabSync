@@ -40,6 +40,23 @@ test('LINE opt-in, redirect, PKCE and identity verification', async () => {
   }
 });
 
+test('LINE can be tested without production policy approval only on isolated LabSync Preview', () => {
+  const preview = {
+    ...env, LEGAL_APPROVED: 'false', VERCEL_ENV: 'preview',
+    VERCEL_GIT_COMMIT_REF: 'feat/course-catchup-20261124', OPERATIONS_MODE: 'preview',
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'labsync-preview',
+    FIREBASE_ADMIN_CLIENT_EMAIL: 'test@labsync-preview.iam.gserviceaccount.com',
+    APP_ORIGIN: 'https://labsync-git-feat-course-catchup-20261124-dongbeen-lees-projects.vercel.app',
+  };
+  expect(lineConfig(preview)?.callback).toBe(preview.APP_ORIGIN + '/api/auth/line/callback');
+  for (const override of [
+    { VERCEL_ENV: 'production' }, { VERCEL_GIT_COMMIT_REF: 'main' },
+    { NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'labsync-80acb' },
+    { FIREBASE_ADMIN_CLIENT_EMAIL: 'test@labsync-80acb.iam.gserviceaccount.com' },
+    { APP_ORIGIN: 'https://labsync-pink.vercel.app' }, { LINE_LOGIN_ENABLED: 'false' },
+  ]) expect(lineConfig({ ...preview, ...override })).toBeNull();
+});
+
 test('LINE defaults to disabled on the review build', async ({ request }) => {
   expect(await request.get('/api/auth/line/status').then(r => r.json())).toEqual({ enabled: false });
   expect((await request.get('/api/auth/line/start')).status()).toBe(503);

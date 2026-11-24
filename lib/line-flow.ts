@@ -3,7 +3,13 @@ import { newState } from './kakao-security';
 
 export function lineConfig(env: Record<string, string | undefined> = process.env) {
   const { LINE_CHANNEL_ID: clientId, LINE_CHANNEL_SECRET: clientSecret, LINE_COOKIE_SECRET: cookieSecret } = env;
-  if (env.LINE_LOGIN_ENABLED !== 'true' || env.LEGAL_APPROVED !== 'true' || !/^\d+$/.test(clientId || '') ||
+  const preview = env.VERCEL_ENV === 'preview' &&
+    env.VERCEL_GIT_COMMIT_REF === 'feat/course-catchup-20261124' &&
+    env.OPERATIONS_MODE === 'preview' &&
+    env.NEXT_PUBLIC_FIREBASE_PROJECT_ID === 'labsync-preview' &&
+    env.FIREBASE_ADMIN_CLIENT_EMAIL?.endsWith('@labsync-preview.iam.gserviceaccount.com') === true &&
+    env.APP_ORIGIN === 'https://labsync-git-feat-course-catchup-20261124-dongbeen-lees-projects.vercel.app';
+  if (env.LINE_LOGIN_ENABLED !== 'true' || (!preview && env.LEGAL_APPROVED !== 'true') || !/^\d+$/.test(clientId || '') ||
       !clientId || !clientSecret || !cookieSecret || cookieSecret.length < 32 || !env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
       !env.FIREBASE_ADMIN_CLIENT_EMAIL || !env.FIREBASE_ADMIN_PRIVATE_KEY) return null;
   try {
