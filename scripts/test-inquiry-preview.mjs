@@ -3,21 +3,18 @@ import { randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const origin = process.env.LABSYNC_PREVIEW_ORIGIN;
-const share = process.env.LABSYNC_PREVIEW_SHARE;
+const oidc = process.env.VERCEL_OIDC_TOKEN;
 const url = new URL(origin ?? '');
 const stableHost = 'labsync-git-feat-course-catchup-20261124-dongbeen-lees-projects.vercel.app';
 const deploymentHost = /^labsync-[a-z0-9]+-dongbeen-lees-projects\.vercel\.app$/;
 assert.ok(url.protocol === 'https:' && url.origin === origin &&
   (url.hostname === stableHost || deploymentHost.test(url.hostname)));
-assert.ok(share, 'Set LABSYNC_PREVIEW_SHARE to a temporary share token for the tested deployment');
-const endpointFor = (path) => {
-  const target = new URL(path, origin);
-  target.searchParams.set('x-vercel-share', share);
-  return target;
-};
-const options = { redirect: 'manual' };
+assert.ok(oidc, 'Run with a development OIDC token from the linked LabSync project');
+const endpointFor = path => new URL(path, origin);
+const authHeaders = { 'x-vercel-trusted-oidc-idp-token': oidc };
+const options = { redirect: 'error', headers: authHeaders };
 const challenge = await fetch(endpointFor('/api/inquiries/status'), options);
-assert.equal(challenge.status, 200, 'Preview challenge requires a share token scoped to this URL');
+assert.equal(challenge.status, 200, 'Preview challenge requires access from the linked LabSync Vercel project');
 const condition = await challenge.json();
 assert.equal(condition.enabled, true);
 assert.equal(condition.testOnly, true);
@@ -38,7 +35,7 @@ const input = {
   source: 'unspecified', website: '', consent: true,
 };
 const endpoint = endpointFor('/api/inquiries');
-const headers = { Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' };
+const headers = { ...authHeaders, Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' };
 const submit = (data) => fetch(endpoint, {
   ...options, method: 'POST', headers, body: JSON.stringify(data),
 });
