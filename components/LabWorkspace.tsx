@@ -82,6 +82,7 @@ function Workspace({ user }: { user: User }) {
   const [labs, setLabs] = useState<Lab[]>([]);
   const [labId, setLabId] = useState('');
   const [testOnly, setTestOnly] = useState(false);
+  const [canOpenPreviewLab, setCanOpenPreviewLab] = useState(false);
   const [operator, setOperator] = useState(false);
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(true);
@@ -89,12 +90,13 @@ function Workspace({ user }: { user: User }) {
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     const ctrl = new AbortController();
-    api<{ labs: Lab[]; testOnly: boolean; operator: boolean }>(user, '', undefined, ctrl.signal)
+    api<{ labs: Lab[]; testOnly: boolean; operator: boolean; canOpenPreviewLab: boolean }>(user, '', undefined, ctrl.signal)
       .then(result => {
         if (ctrl.signal.aborted) return;
         setLabs(result.labs);
         setLabId(current => result.labs.some(lab => lab.id === current) ? current : result.labs[0]?.id || '');
         setTestOnly(result.testOnly);
+        setCanOpenPreviewLab(result.canOpenPreviewLab);
         setOperator(result.operator);
         setLoadFailed(false);
       })
@@ -119,6 +121,17 @@ function Workspace({ user }: { user: User }) {
     } catch (error) { setNotice(messageFor(error)); setBusy(false); }
   }
 
+  async function openTestLab() {
+    setBusy(true);
+    setNotice('');
+    try {
+      const { labId } = await api<{ labId: string }>(user, '', { action: 'open-preview-lab' });
+      setLabId(labId);
+      setNotice('테스트 연구실이 열렸습니다. 아래에서 샘플 요청을 접수할 수 있습니다.');
+      setRevision(current => current + 1);
+    } catch (error) { setNotice(messageFor(error)); setBusy(false); }
+  }
+
   const lab = labs.find(item => item.id === labId);
   return <>
     {testOnly && <p className="draft-notice">Demo / Sample data · 테스트 연구실</p>}
@@ -129,6 +142,7 @@ function Workspace({ user }: { user: User }) {
           {labs.length ? <label>내 연구실<select value={labId} onChange={event => setLabId(event.target.value)}>
             {labs.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select></label> : <p>{busy ? '연구실을 불러오는 중입니다.' : '아직 참여 중인 연구실이 없습니다.'}</p>}
+          {canOpenPreviewLab && !labs.length && <button type="button" className="primary-button" disabled={busy} onClick={openTestLab}>내 테스트 연구실 열기</button>}
         </div>
         <form onSubmit={join}><h2>초대로 참여</h2><label>초대 코드<input name="code" required maxLength={32} minLength={32} autoComplete="off" /></label>
           <button className="secondary-button" disabled={busy}>참여하기</button>

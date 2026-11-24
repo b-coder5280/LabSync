@@ -15,6 +15,14 @@ export class OperationsError extends Error {
   constructor(readonly status: number, readonly code: string) { super(code); }
 }
 
+export function isCloudOperationsPreview() {
+  return process.env.OPERATIONS_MODE === 'preview' &&
+    process.env.VERCEL_ENV === 'preview' &&
+    process.env.VERCEL_GIT_COMMIT_REF === 'feat/course-catchup-20261124' &&
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID === 'labsync-preview' &&
+    process.env.FIREBASE_ADMIN_CLIENT_EMAIL?.endsWith('@labsync-preview.iam.gserviceaccount.com') === true;
+}
+
 export function operationsServices() {
   const mode = process.env.OPERATIONS_MODE;
   const firestoreHost = process.env.FIRESTORE_EMULATOR_HOST;
@@ -26,11 +34,7 @@ export function operationsServices() {
     const app = getApps().find(a => a.name === name) || initializeApp({ projectId: 'demo-labsync-intake' }, name);
     return { db: getFirestore(app), auth: getAuth(app), testOnly: true };
   }
-  const cloudPreview = mode === 'preview' &&
-    process.env.VERCEL_ENV === 'preview' &&
-    process.env.VERCEL_GIT_COMMIT_REF === 'feat/course-catchup-20261124' &&
-    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID === 'labsync-preview' &&
-    process.env.FIREBASE_ADMIN_CLIENT_EMAIL?.endsWith('@labsync-preview.iam.gserviceaccount.com') === true;
+  const cloudPreview = isCloudOperationsPreview();
   const live = mode === 'live' && process.env.LEGAL_APPROVED === 'true';
   if ((!cloudPreview && !live) || firestoreHost || authHost) throw new OperationsError(503, 'operations/disabled');
   try {
@@ -54,6 +58,37 @@ const actorKey = (uid: string) => hash(uid);
 const labRef = (db: Firestore, id: string) => opsRoot(db).collection('labs').doc(id);
 const memberRef = (db: Firestore, uid: string, id: string) =>
   opsRoot(db).collection('profiles').doc(actorKey(uid)).collection('lab_members').doc(id);
+
+export async function checkPreviewStorage() {
+  if (!isCloudOperationsPreview()) throw new OperationsError(404, 'operations/not-found');
+  const { db } = operationsServices();
+  await opsRoot(db).get();
+  return { ready: true };
+}
+
+export async function openPreviewLab(db: Firestore, user: DecodedIdToken) {
+  if (!isCloudOperationsPreview() || user.firebase.sign_in_provider !== 'google.com' || user.email_verified !== true) {
+    throw new OperationsError(403, 'lab/forbidden');
+  }
+  const key = actorKey(user.uid);
+  const id = 'demo-' + key.slice(0, 59);
+  const ref = labRef(db, id);
+  const member = memberRef(db, user.uid, id);
+  return db.runTransaction(async tx => {
+    const [labRow, memberRow] = await tx.getAll(ref, member);
+    if (labRow.exists || memberRow.exists) {
+      if (labRow.get('previewOwner') !== key || memberRow.get('role') !== 'admin') {
+        throw new OperationsError(403, 'lab/forbidden');
+      }
+    } else {
+      const at = new Date().toISOString();
+      tx.create(ref, { name: '내 테스트 연구실', plan: 'demo', createdAt: at, previewOwner: key });
+      tx.set(member.parent.parent!, { uid: user.uid }, { merge: true });
+      tx.create(member, { role: 'admin', joinedAt: at });
+    }
+    return { labId: id };
+  });
+}
 
 async function requireMembership(tx: Transaction, db: Firestore, uid: string, labId: string): Promise<Lab> {
   const [member, lab] = await Promise.all([tx.get(memberRef(db, uid, labId)), tx.get(labRef(db, labId))]);
