@@ -1,5 +1,15 @@
 export const inquirySources = { search: '검색', ai: 'AI 답변', referral: '지인 소개', other: '기타', unspecified: '선택 안 함' };
 export type Inquiry = { email: string; name: string; organization: string; calendarCount: string; message: string; consent: true; source?: keyof typeof inquirySources };
+export const previewInquiry = {
+  email: 'preview-fixture@example.invalid',
+  name: '',
+  organization: '',
+  calendarCount: '2–5',
+  message: 'LabSync Preview 파일럿 문의 접수 테스트입니다.',
+  source: 'unspecified',
+  website: '',
+};
+
 export function parseInquiry(value: unknown): Inquiry | null {
   if (!value || typeof value !== 'object') return null;
   const v = value as Record<string, unknown>;

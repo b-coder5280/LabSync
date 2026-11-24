@@ -1,0 +1,74 @@
+name: LabSync Preview checks
+on:
+  push:
+    branches: [feat/course-catchup-20261124]
+    paths:
+      - '.github/workflows/labsync-preview-checks.yml'
+      - 'app/api/inquiries/**'
+      - 'lib/inquiry*.ts'
+      - 'components/PilotInquiry.tsx'
+
+permissions: {}
+jobs:
+  hosted-inquiry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check hosted Preview inquiry
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { createHash } from 'node:crypto';
+          import { setTimeout as delay } from 'node:timers/promises';
+
+          const origin = 'https://labsync-git-feat-course-catchup-20261124-dongbeen-lees-projects.vercel.app';
+          const options = { redirect: 'error' };
+          let condition;
+          let cookie;
+          for (let attempt = 0; attempt < 30; attempt++) {
+            const res = await fetch(origin + '/api/inquiries/status', options);
+            assert.notEqual(res.status, 401, 'Preview deployment requires Vercel authentication');
+            if (res.ok) {
+              const body = await res.json();
+              if (body.fixtureOnly === true) {
+                assert.equal(body.enabled, true);
+                assert.equal(body.testOnly, true);
+                assert.equal(typeof body.nonce, 'string');
+                const header = res.headers.get('set-cookie');
+                assert.match(header ?? '', /; secure/i);
+                assert.match(header ?? '', /; httponly/i);
+                cookie = header.split(';')[0];
+                condition = body;
+                break;
+              }
+            }
+            await delay(10000);
+          }
+          assert.ok(condition, 'Hosted Preview did not expose the synthetic inquiry challenge');
+          await delay(1700);
+
+          const hash = createHash('sha256').update(process.env.GITHUB_RUN_ID).digest('hex');
+          const id = [hash.slice(0, 8), hash.slice(8, 12), '4' + hash.slice(13, 16), '8' + hash.slice(17, 20), hash.slice(20, 32)].join('-');
+          const input = {
+            id, nonce: condition.nonce, email: 'preview-fixture@example.invalid',
+            name: '', organization: '', calendarCount: '2–5',
+            message: 'LabSync Preview 파일럿 문의 접수 테스트입니다.',
+            source: 'unspecified', website: '', consent: true,
+          };
+          const endpoint = origin + '/api/inquiries';
+          const headers = { Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' };
+          const submit = (data) => fetch(endpoint, {
+            ...options, method: 'POST', headers, body: JSON.stringify(data),
+          });
+          assert.equal((await fetch(endpoint, options)).status, 401, 'Anonymous reads should be blocked');
+          const rejected = await submit({ ...input, email: 'different-fixture@example.invalid' });
+          assert.equal(rejected.status, 400);
+          assert.equal((await rejected.json()).error, 'inquiry/preview-fixture-required');
+          const saved = await submit(input);
+          assert.ok([200, 201].includes(saved.status), 'Expected storage receipt, got ' + saved.status);
+          assert.deepEqual(await saved.json(), { id, duplicate: saved.status === 200, testOnly: true });
+          const retry = await submit(input);
+          assert.equal(retry.status, 200);
+          assert.deepEqual(await retry.json(), { id, duplicate: true, testOnly: true });
+          console.log('PASS: hosted fixture-only intake, committed receipt, duplicate retry, anonymous read blocked.');
+          NODE

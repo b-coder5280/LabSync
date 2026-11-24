@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
     return reply({ ...result, testOnly: config.testOnly }, result.duplicate ? 200 : 201);
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
+    if (code === 'inquiry/preview-fixture-required') return reply({ error: code }, 400);
     if (code === 'inquiry/conflict') return reply({ error: code }, 409);
     if (code === 'inquiry/rate-limit') return reply({ error: code }, 429);
     return reply({ error: 'inquiry/storage-unavailable' }, 503);
