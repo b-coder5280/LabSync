@@ -17,3 +17,22 @@
 대시보드 HTML은 로그인 안내만 제공합니다. 요청과 처리 이력은 인증된 API 응답으로 전달합니다. 검색엔진 등록·처리·색인은 [콘솔 증빙](search-console-status.md)에서 별도로 봅니다. FAQ 구조화 데이터나 llms.txt 추가를 노출 성과로 집계하지 않습니다.
 
 공개 변경 전 증빙(별도 제출 ZIP) · 로컬 검증 후 증빙(별도 제출 ZIP)
+
+## 7주차 공개 운영 재검증 · 2026년 11월 24일 KST
+
+사용자가 승인한 SEO 변경을 운영에 배포했습니다. 운영 커밋은 `185fa05572118b168efccc7f848077a93a27d2b2`입니다. 이 배포에서 수정한 파일은 `.env.example`, `app/layout.tsx`, `app/page.tsx`, `app/llms.txt/route.ts`입니다. Firebase 설정·인증 코드·데이터 처리 경로에는 변경이 없습니다.
+
+| 공개 검증 | 결과 |
+| --- | --- |
+| 홈 | HTTP 200. 모바일 사용자 에이전트 요청도 HTTP 200. |
+| 메타데이터 | title, description, canonical, OG 확인. OG 이미지 HTTP 200와 대체 텍스트 확인. |
+| FAQ | 사용자에게 표시되는 6개 질문·답변이 FAQPage 구조화 데이터와 일치. |
+| 서비스 정의·공식 출처 | 운영 홈에서 서비스 정의와 Google Calendar 공유 권한 공식 안내 링크 확인. |
+| llms.txt | HTTP 200, UTF-8 텍스트. |
+| sitemap.xml / robots.txt | 두 경로 모두 HTTP 200. 사이트맵에 운영 홈 등록, 로봇 파일에서 사이트맵 참조 확인. |
+| 본문 이미지 | 본문 이미지 요소 없음. OG 이미지 대체 텍스트는 확인. |
+| 기존 Google 로그인 UI | 운영 HTML에서 기존 로그인 버튼 확인. 실제 계정으로 다시 로그인하는 검증은 수행하지 않았습니다. |
+
+공개 HTML에는 Google 소유확인 태그가 없습니다. Google·Naver·Bing 속성, 소유권 및 사이트맵 처리 상태는 각 콘솔 화면에서 별도로 확인할 항목입니다.
+
+[운영 사이트](https://labsync-pink.vercel.app/) · [llms.txt](https://labsync-pink.vercel.app/llms.txt) · [배포 커밋](https://github.com/b-coder5280/LabSync/commit/185fa05572118b168efccc7f848077a93a27d2b2)
