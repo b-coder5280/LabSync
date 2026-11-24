@@ -26,10 +26,16 @@ export function operationsServices() {
     const app = getApps().find(a => a.name === name) || initializeApp({ projectId: 'demo-labsync-intake' }, name);
     return { db: getFirestore(app), auth: getAuth(app), testOnly: true };
   }
-  if (mode !== 'live' || process.env.LEGAL_APPROVED !== 'true' || firestoreHost || authHost) throw new OperationsError(503, 'operations/disabled');
+  const cloudPreview = mode === 'preview' &&
+    process.env.VERCEL_ENV === 'preview' &&
+    process.env.VERCEL_GIT_COMMIT_REF === 'feat/course-catchup-20261124' &&
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID === 'labsync-preview' &&
+    process.env.FIREBASE_ADMIN_CLIENT_EMAIL?.endsWith('@labsync-preview.iam.gserviceaccount.com') === true;
+  const live = mode === 'live' && process.env.LEGAL_APPROVED === 'true';
+  if ((!cloudPreview && !live) || firestoreHost || authHost) throw new OperationsError(503, 'operations/disabled');
   try {
     const app = firebaseAdminApp();
-    return { db: getFirestore(app), auth: getAuth(app), testOnly: false };
+    return { db: getFirestore(app), auth: getAuth(app), testOnly: cloudPreview };
   } catch {
     throw new OperationsError(503, 'operations/configuration');
   }
