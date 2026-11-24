@@ -93,15 +93,42 @@ export function AuthControl() {
     finally { locked.current = false; setBusy(false); }
   }
 
+  const messageContent = <>
+    <p>{message}</p>
+    <button type="button" aria-label="로그인 알림 닫기" onClick={() => setMessage("")}>닫기</button>
+  </>;
+
   return <div className="auth-control" ref={root} data-clarity-mask="true">
     {user ? <>
       <button ref={trigger} type="button" className="auth-button" aria-expanded={open} aria-controls="account-panel" onClick={() => setOpen(!open)}><span className="avatar" aria-hidden="true">{(user.displayName || "사용자").slice(0, 1)}</span><span className="account-name">{user.displayName || "내 계정"}</span><span aria-hidden="true">⌄</span></button>
       {open && <div id="account-panel" className="account-panel"><strong>{user.displayName || "Google 계정"}</strong><p className="account-email">{user.email}</p><div className="access-notice"><Link href="/dashboard" onClick={() => setOpen(false)}>연구실 요청 관리</Link><p>초대를 받은 연구실의 요청을 확인할 수 있습니다.</p></div><button className="auth-button" type="button" disabled={busy} onClick={logout}>{busy ? "로그아웃 중…" : "로그아웃"}</button></div>}
-    </> : <div className="signin-options"><button ref={trigger} type="button" className="auth-button" disabled={busy || (firebaseConfigured && !ready)} onClick={login}><GoogleIcon /><span>{busy ? "로그인 중…" : firebaseConfigured && !ready ? "계정 확인 중…" : "Google로 로그인"}</span></button><button className="signin-more" type="button" aria-label="다른 로그인 방법" aria-expanded={open} aria-controls="signin-panel" onClick={() => setOpen(!open)}>⌄</button>{open && <div className="account-panel" id="signin-panel"><strong>로그인 방법</strong>{kakaoEnabled ? <a className="kakao-button" href="/api/auth/kakao/start" onClick={event => { event.preventDefault(); track('login_start', 'kakao'); const target = new URL('/api/auth/kakao/start', location.origin); target.searchParams.set('returnTo', location.pathname + location.search + location.hash); location.assign(target.href); }}>카카오로 로그인</a> : <p className="access-notice">카카오 로그인 준비 중<br /><small>현재 Google 로그인을 이용해 주세요.</small></p>}{lineEnabled ? <button className="auth-button" type="button" onClick={() => {
-      const target = new URL('/api/auth/line/start', location.origin);
-      target.searchParams.set('returnTo', location.pathname + location.search + location.hash);
-      location.assign(target.href);
-    }}>LINE으로 로그인</button> : <p className="access-notice">LINE 로그인 준비 중</p>}<p className="account-email">로그인은 파일럿 신청이나 연구실 접근 권한을 자동으로 부여하지 않습니다.</p></div>}</div>}
-    {message && <div className="auth-message" role="status"><p>{message}</p><button type="button" aria-label="로그인 알림 닫기" onClick={() => setMessage("")}>닫기</button></div>}
+    </> : <>
+      <button ref={trigger} type="button" className="auth-button" aria-expanded={open} aria-controls="signin-panel" onClick={() => setOpen(!open)}>
+        로그인 <span aria-hidden="true">⌄</span>
+      </button>
+      {open && <div className="account-panel" id="signin-panel">
+        <strong>로그인 방법</strong>
+        <div className="signin-panel-options">
+          <button type="button" className="auth-button" disabled={busy || (firebaseConfigured && !ready)} onClick={login}>
+            <GoogleIcon />
+            <span>{busy ? "로그인 중…" : firebaseConfigured && !ready ? "계정 확인 중…" : "Google로 로그인"}</span>
+          </button>
+          {kakaoEnabled && <a className="kakao-button" href="/api/auth/kakao/start" onClick={event => {
+            event.preventDefault();
+            track('login_start', 'kakao');
+            const target = new URL('/api/auth/kakao/start', location.origin);
+            target.searchParams.set('returnTo', location.pathname + location.search + location.hash);
+            location.assign(target.href);
+          }}>카카오로 로그인</a>}
+          {lineEnabled && <button className="auth-button" type="button" onClick={() => {
+            const target = new URL('/api/auth/line/start', location.origin);
+            target.searchParams.set('returnTo', location.pathname + location.search + location.hash);
+            location.assign(target.href);
+          }}>LINE으로 로그인</button>}
+        </div>
+        {message && <div className="auth-message signin-message" role="status">{messageContent}</div>}
+      </div>}
+    </>}
+    {message && (user || !open) && <div className="auth-message" role="status">{messageContent}</div>}
   </div>;
 }

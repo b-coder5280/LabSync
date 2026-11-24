@@ -1,6 +1,6 @@
-.signin-options { display: flex; gap: 4px; }
-.signin-more { border: 1px solid #c7ced8; border-radius: 6px; background: white; color: #253247; width: 32px; min-height: 44px; cursor: pointer; }
-.kakao-button { display: flex; align-items: center; justify-content: center; min-height: 48px; background: #fee500; color: #191919; border-radius: 6px; margin-block: 18px; font-size: 16px; }
+.signin-panel-options { display: grid; gap: 8px; margin-top: 12px; }
+.signin-message { position: static; width: auto; margin-top: 12px; padding: 12px; box-shadow: none; }
+.kakao-button { display: flex; align-items: center; justify-content: center; min-height: 48px; background: #fee500; color: #191919; border-radius: 6px; font-size: 16px; }
 .hero-buyer { color: #365f9d; margin-bottom: 12px; font-size: 15px; font-weight: 550; }
 .hero h1 { font-size: clamp(38px, 4vw, 58px); }
 .hero h1 > span:first-child { font-size: inherit; }
@@ -35,4 +35,4 @@ summary:focus-visible { outline: 3px solid #6696ff; outline-offset: 5px; }
 .consent-panel > div { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .consent-panel .secondary-button { min-height: 44px; font-size: 14px; padding: 10px 14px; }
 @media(max-width: 800px) { .faq-grid { grid-template-columns: 1fr; gap: 30px; } .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid nav { grid-column: 1/-1; } .hero h1 { font-size: 48px; } .hero h1 br { display: block; } .hero h1 em { margin-left: 0; } }
-@media(max-width: 480px) { .header .wordmark { font-size: 20px; } .brand-link { margin-inline: 2px; } .signin-more { width: 28px; } .header-inner { gap: 6px; } .hero h1 { font-size: 32px; line-height: 1.25; } .hero h1 br { display: block; } .hero h1 em { margin-left: 0; } .hero-buyer { font-size: 14px; } .footer-grid { grid-template-columns: 1fr; gap: 26px; } .legal-page h1 { font-size: 32px; } }
+@media(max-width: 480px) { .header .wordmark { font-size: 20px; } .brand-link { margin-inline: 2px; } .header-inner { gap: 6px; } .hero h1 { font-size: 32px; line-height: 1.25; } .hero h1 br { display: block; } .hero h1 em { margin-left: 0; } .hero-buyer { font-size: 14px; } .footer-grid { grid-template-columns: 1fr; gap: 26px; } .legal-page h1 { font-size: 32px; } }

@@ -7,8 +7,9 @@ test('public SEO, draft policies and disabled integrations', async ({ page, requ
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /^https:\/\/labsync-pink\.vercel\.app\/?$/);
   const data = await page.locator('script[type="application/ld+json"]').textContent();
   expect(JSON.parse(data!)['@graph'].map((item: { '@type': string }) => item['@type'])).toEqual(['Organization', 'Service', 'FAQPage']);
-  await page.getByRole('button', { name: '다른 로그인 방법' }).click();
-  await expect(page.locator('#signin-panel')).toContainText('카카오 로그인 준비 중');
+  await page.getByRole('button', { name: '로그인', exact: true }).click();
+  await expect(page.locator('#signin-panel').getByRole('button', { name: 'Google로 로그인' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'LINE으로 로그인' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: '카카오로 로그인' })).toHaveCount(0);
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: '분석 수집 설정' }).click();
@@ -27,4 +28,16 @@ test('public SEO, draft policies and disabled integrations', async ({ page, requ
   expect((await request.get('/api/auth/kakao/callback?state=forged&code=forged')).status()).toBe(503);
   expect((await request.post('/api/auth/kakao/session')).status()).toBe(503);
   expect(await (await request.get('/api/auth/kakao/status')).json()).toEqual({ enabled: false });
+});
+
+test('enabled providers are shown inside the login menu', async ({ page }) => {
+  await page.route('**/api/auth/kakao/status', route => route.fulfill({ json: { enabled: true } }));
+  await page.route('**/api/auth/line/status', route => route.fulfill({ json: { enabled: true } }));
+  await page.goto('/');
+  await expect(page.getByRole('link', { name: '카카오로 로그인' })).toHaveCount(0);
+  await page.getByRole('button', { name: '로그인', exact: true }).click();
+  const panel = page.locator('#signin-panel');
+  await expect(panel.getByRole('button', { name: 'Google로 로그인' })).toBeVisible();
+  await expect(panel.getByRole('link', { name: '카카오로 로그인' })).toBeVisible();
+  await expect(panel.getByRole('button', { name: 'LINE으로 로그인' })).toBeVisible();
 });

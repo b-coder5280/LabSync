@@ -20,6 +20,7 @@ test.describe('live Firebase configuration and Google popup', () => {
   test('Google identity popup can be cancelled and reopened without losing the page', async ({ page }) => {
     test.setTimeout(60000);
     await page.goto('/?source=auth-check#pilot');
+    await page.getByRole('button', { name: '로그인', exact: true }).click();
     for (let attempt = 0; attempt < 2; attempt++) {
       const popupPromise = page.waitForEvent('popup');
       await page.getByRole('button', { name: 'Google로 로그인', exact: true }).click();

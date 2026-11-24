@@ -12,7 +12,15 @@ for (const width of [375, 768, 1440]) {
     await expect(page.locator('h1')).toContainText('기존 Google Calendar는 그대로,');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await expect(page.getByRole('button', { name: 'Google로 로그인', exact: true })).toBeEnabled();
+    const loginTrigger = page.getByRole('button', { name: '로그인', exact: true });
+    const google = page.getByRole('button', { name: 'Google로 로그인', exact: true });
+    await expect(google).toHaveCount(0);
+    await loginTrigger.click();
+    await expect(loginTrigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(google).toBeEnabled();
+    await page.keyboard.press('Escape');
+    await expect(loginTrigger).toBeFocused();
+    await expect(google).toHaveCount(0);
     for (const cta of await page.getByRole('link', { name: '파일럿 문의하기' }).all()) {
       await expect(cta).toHaveText('파일럿 문의하기↗');
       await expect(cta).toHaveAttribute('href', '#contact');
@@ -69,6 +77,7 @@ test('blocked popup is reported by the Firebase SDK and can be retried', async (
   test.skip(process.env.LABSYNC_AUTH_READY !== '1', 'Requires enabled Firebase Authentication and network access; not a simulated login.');
   await page.addInitScript(() => { window.open = () => null; });
   await page.goto('/#pilot');
+  await page.getByRole('button', { name: '로그인', exact: true }).click();
   const login = page.getByRole('button', { name: 'Google로 로그인', exact: true });
   await login.click();
   await expect(page.getByRole('status')).toContainText('팝업이 차단되었습니다.');
