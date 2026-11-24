@@ -42,6 +42,12 @@ export function inquiryConfig(): InquiryConfig | null {
   } catch { return null; }
 }
 
+export function acceptsInquiryOrigin(config: InquiryConfig, origin: string) {
+  if (origin === config.origin) return true;
+  const deploymentHost = process.env.VERCEL_URL;
+  return config.mode === 'preview' && Boolean(deploymentHost) && origin === 'https://' + deploymentHost;
+}
+
 export function inquiryServices() {
   const config = inquiryConfig();
   if (!config) throw new Error('inquiry/disabled');

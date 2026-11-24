@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { inquiryConfig, inquiryServices, saveInquiry } from '@/lib/inquiry-server';
+import { acceptsInquiryOrigin, inquiryConfig, inquiryServices, saveInquiry } from '@/lib/inquiry-server';
 import { parseInquiry } from '@/lib/inquiry';
 import { readJsonObject } from '@/lib/request-body';
 import { validUuid } from '@/lib/operations';
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const config = inquiryConfig();
   if (!config) return reply({ error: 'inquiry/disabled' }, 503);
-  if (request.nextUrl.origin !== config.origin || request.headers.get('origin') !== config.origin) return reply({ error: 'inquiry/invalid-origin' }, 403);
+  if (!acceptsInquiryOrigin(config, request.nextUrl.origin) || request.headers.get('origin') !== request.nextUrl.origin) return reply({ error: 'inquiry/invalid-origin' }, 403);
   const parsed = await readJsonObject(request);
   if (parsed.status !== 200) return reply({ error: 'inquiry/invalid-input' }, parsed.status);
   const input = parsed.value;
