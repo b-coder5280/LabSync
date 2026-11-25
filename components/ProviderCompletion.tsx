@@ -12,7 +12,7 @@ const messages: Record<string, string> = {
 };
 export function ProviderCompletion({ provider = 'kakao' }: { provider?: 'kakao' | 'line' }) {
   const name = provider === 'line' ? 'LINE' : '카카오';
-  const [message, setMessage] = useState(name + ' 인증 결과를 확인하고 있습니다…');
+  const [message, setMessage] = useState('LabSync에 로그인하는 중…');
   const task = useRef<Promise<void> | null>(null);
   useEffect(() => {
     let active = true;
@@ -23,8 +23,10 @@ export function ProviderCompletion({ provider = 'kakao' }: { provider?: 'kakao' 
         const message = known ? messages[reason].replaceAll('카카오', name) : name + ' 로그인을 완료하지 못했습니다.';
         throw new Error(`${message} (${provider}/${known ? reason : 'unknown-error'})`);
       }
-      const auth = await prepareAuth();
-      const response = await fetch('/api/auth/' + provider + '/session', { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
+      const [auth, response] = await Promise.all([
+        prepareAuth(),
+        fetch('/api/auth/' + provider + '/session', { method: 'POST', credentials: 'same-origin', cache: 'no-store' }),
+      ]);
       if (!response.ok) throw new Error('로그인 연결이 만료되었거나 준비되지 않았습니다. 홈페이지에서 다시 시도해 주세요.');
       const result = await response.json();
       await signInWithCustomToken(auth, result.token);
