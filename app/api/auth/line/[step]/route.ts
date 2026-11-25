@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { firebaseAdminAuth } from '@/lib/firebase-admin';
+import { logAuthCallbackFailure, type CallbackStage } from '@/lib/auth-callback-log';
 import { safeReturnPath, seal, stateMatches, unseal } from '@/lib/kakao-security';
 import { firebaseTokenForProvider } from '@/lib/kakao-flow';
 import { beginLine, lineConfig, verifyLine } from '@/lib/line-flow';
@@ -41,14 +42,20 @@ export async function GET(request: NextRequest, context: Context) {
   if (params.has('error')) return finish(params.get('error') === 'access_denied' ? 'cancelled' : 'provider-error');
   const code = params.get('code');
   if (!code || code.length > 2048) return finish('missing-code');
+  let stage: CallbackStage = 'provider-verification';
   try {
     const uid = await verifyLine(code, flow, config);
-    const token = await firebaseTokenForProvider(uid, 'LINE 사용자', 'line', firebaseAdminAuth());
+    stage = 'firebase-init';
+    const auth = firebaseAdminAuth();
+    stage = 'firebase-session';
+    const token = await firebaseTokenForProvider(uid, 'LINE 사용자', 'line', auth);
+    stage = 'session-cookie';
     const response = finish();
     response.cookies.set(sessionCookie, seal({ token, returnTo: flow.returnTo }, config.cookieSecret, 'line-session', 60),
       { ...cookie, sameSite: 'strict', maxAge: 60 });
     return response;
-  } catch {
+  } catch (error) {
+    logAuthCallbackFailure('line', stage, error);
     return finish('server-error');
   }
 }
